@@ -181,6 +181,8 @@ export interface CourseModule {
   exercises: Exercise[]
   /** Paquets de vocabulaire liés au module (en plus du vocabulaire des séances). */
   deckIds?: string[]
+  /** Parcours auquel appartient le module (affiché à part dans « Cours »), ex. « Lexie 👶 ». */
+  group?: string
 }
 
 export type ModuleStep =

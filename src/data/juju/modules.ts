@@ -1,4 +1,5 @@
 import type { CourseModule } from '../../types'
+import { lexieModules } from './lexie.ts'
 
 // Accès Jujularage : modules thématiques (onglet « Cours »).
 // Chaque module = expressions clés + vocabulaire (deckIds) + grammaire + oral + écrit + exercices.
@@ -6,7 +7,7 @@ import type { CourseModule } from '../../types'
 
 const tr = 'Traduis en anglais.'
 
-export const jujuModules: CourseModule[] = [
+const coreModules: CourseModule[] = [
   {
     id: 'jj-me',
     title: 'Me, my family & friends',
@@ -304,3 +305,5 @@ export const jujuModules: CourseModule[] = [
     ],
   },
 ]
+
+export const jujuModules: CourseModule[] = [...coreModules, ...lexieModules]

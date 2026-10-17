@@ -1,4 +1,5 @@
 import type { VocabDeck, VocabItem } from '../../types'
+import { lexieDecks } from './lexie.ts'
 
 // Accès Jujularage : paquets de vocabulaire A1 → A2, autour du quotidien et de ses passions.
 // Règle : ne jamais changer l'`id` d'un mot existant (il porte la progression).
@@ -300,7 +301,7 @@ const fluency: VocabItem[] = [
   { id: 'jv-fl-how-about', en: 'how about…? / what about…?', fr: 'et si…? que dirais-tu de… ?', level: 'A2', example: 'How about a beer after work?' },
 ]
 
-export const jujuDecks: VocabDeck[] = [
+const coreDecks: VocabDeck[] = [
   { id: 'jj-family', title: 'La famille & les proches', icon: '👨‍👩‍👧', description: 'Parents, frères et sœurs, amis, collègues.', kind: 'decouverte', items: family },
   { id: 'jj-animals', title: 'Les animaux', icon: '🐾', description: 'Animaux de compagnie, de la ferme et sauvages.', kind: 'decouverte', items: animals },
   { id: 'jj-colours', title: 'Les couleurs', icon: '🎨', description: 'Les couleurs de base et leurs nuances.', kind: 'decouverte', items: colours },
@@ -314,3 +315,5 @@ export const jujuDecks: VocabDeck[] = [
   { id: 'jj-idioms', title: 'Expressions & idiomes', icon: '💬', description: 'Pour parler comme un natif : piece of cake, my round…', kind: 'decouverte', items: idioms },
   { id: 'jj-fluency', title: 'Parler avec fluidité', icon: '🌊', description: 'Les petits mots pour enchaîner : first, then, actually, by the way…', kind: 'decouverte', items: fluency },
 ]
+
+export const jujuDecks: VocabDeck[] = [...coreDecks, ...lexieDecks]

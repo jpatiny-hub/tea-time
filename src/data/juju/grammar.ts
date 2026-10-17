@@ -1,9 +1,10 @@
 import type { GrammarLesson } from '../../types'
+import { lexieGrammar } from './lexie.ts'
 
 // Accès Jujularage (A1 → A2) : les bases, expliquées simplement, avec des exemples tirés de ses passions.
 // Règle : ne jamais changer l'`id` d'un exercice existant (il porte la progression).
 
-export const jujuGrammarLessons: GrammarLesson[] = [
+const coreLessons: GrammarLesson[] = [
   // ------------------------------------------------------------------ LES BASES
   {
     id: 'jj-g-be',
@@ -573,6 +574,8 @@ export const jujuGrammarLessons: GrammarLesson[] = [
     ],
   },
 ]
+
+export const jujuGrammarLessons: GrammarLesson[] = [...coreLessons, ...lexieGrammar]
 
 export const jujuGrammarGroups = [
   { id: 'temps' as const, title: 'Les temps', icon: '⏳', description: 'Present simple, continuous, passé, futur.' },

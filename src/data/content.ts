@@ -86,6 +86,7 @@ export const TAG_LABELS: Record<string, string> = {
   can: 'Can',
   questions: 'Les questions',
   translation: 'Traduction',
+  imperative: 'Impératif (parler à un enfant)',
   culture: 'Culture',
 }
 

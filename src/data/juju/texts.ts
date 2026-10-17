@@ -1,8 +1,9 @@
 import type { Dialogue, ReadingText, WritingTask } from '../../types'
+import { lexieDialogue, lexieReading } from './lexie.ts'
 
 // Accès Jujularage : textes courts (A1 → A2), dialogues et sujets d'écriture.
 
-export const jujuReadingTexts: ReadingText[] = [
+const coreReadingTexts: ReadingText[] = [
   {
     id: 'jj-r-julien',
     title: 'Hello, my name is Julien',
@@ -102,7 +103,9 @@ export const jujuReadingTexts: ReadingText[] = [
   },
 ]
 
-export const jujuDialogues: Dialogue[] = [
+export const jujuReadingTexts: ReadingText[] = [...coreReadingTexts, lexieReading]
+
+const coreDialogues: Dialogue[] = [
   {
     id: 'jj-d-new-colleague',
     title: 'Meeting a new colleague',
@@ -175,6 +178,8 @@ export const jujuDialogues: Dialogue[] = [
     ],
   },
 ]
+
+export const jujuDialogues: Dialogue[] = [...coreDialogues, lexieDialogue]
 
 export const jujuWritingTasks: WritingTask[] = [
   {

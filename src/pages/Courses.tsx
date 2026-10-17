@@ -10,11 +10,16 @@ import { allDecks } from '../data/vocabulary'
 export function Courses() {
   const data = useProgress()
   const sorted = [...sessions].reverse()
+  // Modules principaux d'abord, puis les parcours (ex. « Lexie 👶 »).
+  const groups = Array.from(new Set(modules.map((m) => m.group ?? '')))
 
   return (
     <Page title="Mes cours" subtitle={sessions.length > 0 ? 'Tout ce qui a été vu en séance, transformé en exercices.' : 'Des modules thématiques : expressions, vocabulaire, grammaire, oral et écrit.'}>
-      <Section title={`Les ${modules.length} modules`}>
-        {modules.map((m) => {
+      {groups.map((group) => {
+        const list = modules.filter((m) => (m.group ?? '') === group)
+        return (
+      <Section key={group || 'main'} title={group || `Les ${list.length} modules`}>
+        {list.map((m) => {
           const steps = moduleSteps(m)
           const done = steps.filter((s) => data.steps[`${m.id}:${s.step}`]).length
           const nSessions = sessions.filter((s) => s.module === m.id).length
@@ -35,6 +40,8 @@ export function Courses() {
           )
         })}
       </Section>
+        )
+      })}
 
       {sorted.length > 0 && <Section title="Séances (de la plus récente)">
         {sorted.map((s) => {

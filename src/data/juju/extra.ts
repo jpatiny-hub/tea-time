@@ -57,6 +57,16 @@ export const jujuPronunciation: PronunciationItem[] = [
 
 export const jujuChangelog: ChangelogEntry[] = [
   {
+    version: 3,
+    date: '2026-10-17',
+    title: 'Nouveau parcours : Lexie 👶',
+    changes: [
+      'Six modules pour parler anglais avec un tout-petit, du plus simple au plus riche : mots doux, biberon et repas, change, bain et dodo, s\'habiller et la crèche, jouer et chanter, émotions et sécurité.',
+      '83 mots et expressions en 6 paquets, avec les différences UK / US (nappy / diaper, nursery / daycare, dummy / pacifier).',
+      "Une leçon « Let's…, Don't…, Do you want…? », 34 phrases à traduire, des comptines, un dialogue « A morning with Lexie » et 5 conseils pour élever un bébé en anglais.",
+    ],
+  },
+  {
     version: 2,
     date: '2026-10-16',
     title: 'Rappel quotidien 🔔',
