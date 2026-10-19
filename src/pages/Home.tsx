@@ -10,35 +10,36 @@ import { sessions } from '../data/sessions/index'
 import { card, cardLink, hero, IconTile, SpeakButton, type Tone } from '../components/ui'
 import { seasonalTheme, themes } from '../data/themes'
 import { XpBar } from '../components/XpBar'
-import { EDITION, isJuju } from '../edition'
+import { EDITION, isDutch, isJuju } from '../edition'
+import { extra } from '../data/edition-content'
 import { formatDateFr } from '../lib/text'
 import { grammarLessons } from '../data/grammar'
 
 const sections: { to: string; label: string; icon: string; desc: string; tone: Tone }[] = [
-  { to: '/cours', label: isJuju ? 'Mes modules' : 'Mes cours', icon: '🎓', desc: isJuju ? 'Famille, bière, sport, CDMO…' : 'Séances et modules', tone: 'violet' },
-  { to: '/temps', label: 'Labo des temps', icon: '⏳', desc: isJuju ? 'Présent, passé, futur' : 'Past simple, present perfect…', tone: 'amber' },
+  { to: '/cours', label: extra ? extra.ui.coursesLabel : 'Mes cours', icon: '🎓', desc: extra ? extra.ui.coursesDesc : 'Séances et modules', tone: 'violet' },
+  { to: '/temps', label: isDutch ? 'Les verbes' : 'Labo des temps', icon: '⏳', desc: extra ? extra.ui.tensesDesc : 'Past simple, present perfect…', tone: 'amber' },
   { to: '/grammaire', label: 'Grammaire', icon: '📖', desc: `${grammarLessons.length} fiches + exercices`, tone: 'sky' },
-  { to: '/vocabulaire', label: 'Vocabulaire', icon: '🗂️', desc: isJuju ? `${discoveryDecks.length} paquets` : 'Cours + découverte', tone: 'emerald' },
+  { to: '/vocabulaire', label: 'Vocabulaire', icon: '🗂️', desc: extra ? `${discoveryDecks.length} paquets` : 'Cours + découverte', tone: 'emerald' },
   { to: '/pratique/ecrit', label: "Atelier d'écriture", icon: '🖋️', desc: 'Rédiger, se relire', tone: 'rose' },
   { to: '/pratique', label: 'Pratique', icon: '🎧', desc: 'Oral, écoute, lecture', tone: 'rose' },
   ...(themes.length > 0 ? [{ to: '/themes', label: 'Thèmes & culture', icon: '🎭', desc: 'Fêtes, références, idiomes', tone: 'orange' as Tone }] : []),
   ...(translationExercises.length > 0 ? [{ to: '/pratique/traduction', label: 'Traduire', icon: '🔤', desc: `${translationExercises.length} petites phrases`, tone: 'orange' as Tone }] : []),
+  ...(extra ? [{ to: '/pratique/exercices', label: 'Exercices', icon: '🧩', desc: 'Textes à trous, phrases à corriger…', tone: 'orange' as Tone }] : []),
   { to: '/progres', label: 'Progrès', icon: '📈', desc: 'Statistiques et sauvegarde', tone: 'teal' },
 ]
 
 function greeting(date: Date): string {
   const h = date.getHours()
-  if (h < 12) return 'Good morning!'
-  if (h < 18) return 'Good afternoon!'
-  return 'Good evening!'
+  const [morning, afternoon, evening] = EDITION.greetings
+  return h < 12 ? morning : h < 18 ? afternoon : evening
 }
 
 // Une expression différente chaque jour, tirée des idiomes et collocations.
 function expressionOfTheDay() {
-  const ids = isJuju ? ['jj-idioms', 'jj-fluency'] : ['idioms', 'collocations']
+  const ids = extra ? extra.expressionDeckIds : ['idioms', 'collocations']
   const pool = discoveryDecks.filter((d) => ids.includes(d.id)).flatMap((d) => d.items)
   const day = Math.floor(Date.now() / 86_400_000)
-  return pool[day % pool.length]
+  return pool.length > 0 ? pool[day % pool.length] : undefined
 }
 
 export function Home() {
@@ -75,7 +76,7 @@ export function Home() {
           </div>
           <Link to="/progres" className="rounded-2xl bg-white/15 px-3 py-2 text-center ring-1 ring-white/25">
             <p className="text-lg font-extrabold leading-none">🔥 {days}</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-white/80">jour{days > 1 ? 's' : ''}</p>
+            <p className="mt-0.5 text-[0.625rem] font-semibold text-white/80">jour{days > 1 ? 's' : ''}</p>
           </Link>
         </div>
 
@@ -155,16 +156,18 @@ export function Home() {
         </Link>
       )}
 
+      {expr && (
       <div className={`${card} relative mt-3 overflow-hidden`}>
         <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 bg-linear-to-b from-emerald-400 to-teal-500" />
         <div className="flex items-center justify-between">
-          <p className="text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">💬 Expression du jour</p>
+          <p className="text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">💬 {isDutch ? 'Mot du jour' : 'Expression du jour'}</p>
           <SpeakButton text={expr.example ? `${expr.en}. ${expr.example}` : expr.en} small />
         </div>
         <p className="mt-1 text-xl font-extrabold">{expr.en}</p>
         <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{expr.fr}</p>
         {expr.example && <p className="mt-1.5 text-sm italic text-gray-500 dark:text-gray-400">« {expr.example} »</p>}
       </div>
+      )}
 
       <h2 className="mt-7 text-xs font-extrabold uppercase tracking-wider text-gray-500 dark:text-gray-400">Explorer</h2>
       <div className="mt-2.5 grid grid-cols-2 gap-3">

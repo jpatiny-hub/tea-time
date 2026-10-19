@@ -1,5 +1,5 @@
 import type { Exercise } from '../types'
-import { isJuju } from '../edition.ts'
+import { extra } from './edition-content.ts'
 
 // « Trouver les bonnes formulations » : exercices de reformulation pour passer du B2 au C1.
 // Pour les réécritures libres (transform), plusieurs réponses sont acceptées et on peut
@@ -305,6 +305,6 @@ const jojo_synonymExercises: Exercise[] = [
 ]
 
 // Séries de niveau B2 → C1 : réservées à l'accès Jojo.
-export const styleExercises: Exercise[] = isJuju ? [] : jojo_styleExercises
-export const perspectiveExercises: Exercise[] = isJuju ? [] : jojo_perspectiveExercises
-export const synonymExercises: Exercise[] = isJuju ? [] : jojo_synonymExercises
+export const styleExercises: Exercise[] = extra ? [] : jojo_styleExercises
+export const perspectiveExercises: Exercise[] = extra ? [] : jojo_perspectiveExercises
+export const synonymExercises: Exercise[] = extra ? [] : jojo_synonymExercises

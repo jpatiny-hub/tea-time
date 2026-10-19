@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { irregularVerbs } from '../data/irregular-verbs'
+import { extra } from '../data/edition-content'
+import { isDutch } from '../edition'
 import { irregularExercise } from '../data/content'
 import { useProgress } from '../lib/store'
 import { pickExercises } from '../lib/select'
@@ -11,7 +13,7 @@ import { btnPrimary, btnSecondary, card, Page, Pill, SpeakButton } from '../comp
 
 const tiers = [
   { tier: 1, label: 'Incontournables', desc: 'Les plus fréquents' },
-  { tier: 2, label: 'Courants', desc: 'Pour le niveau B2' },
+  { tier: 2, label: 'Courants', desc: extra ? 'Pour aller plus loin' : 'Pour le niveau B2' },
   { tier: 3, label: 'Avancés', desc: 'Vers le C1' },
 ] as const
 
@@ -28,12 +30,12 @@ export function IrregularVerbs() {
     )
   }, [tier, query])
 
-  if (run) return <ExerciseRunner items={run} title="Verbes irréguliers" onExit={() => setRun(null)} />
+  if (run) return <ExerciseRunner items={run} title={extra ? extra.ui.verbsTitle : 'Verbes irréguliers'} onExit={() => setRun(null)} />
 
   const pool = irregularVerbs.filter((v) => v.tier === tier).map(irregularExercise)
 
   return (
-    <Page title="📜 Verbes irréguliers" subtitle="Base → prétérit (past simple) → participe passé (present perfect, passif). Tape les deux formes séparées par un espace." back={{ to: '/temps', label: 'Labo des temps' }}>
+    <Page title={`📜 ${extra ? extra.ui.verbsTitle : 'Verbes irréguliers'}`} subtitle={isDutch ? 'Infinitif → imparfait (singulier) → participe passé (utilisé avec hebben ou zijn). Tape les deux formes séparées par un espace.' : 'Base → prétérit (past simple) → participe passé (present perfect, passif). Tape les deux formes séparées par un espace.'} back={{ to: '/temps', label: 'Labo des temps' }}>
       <div className="flex gap-2">
         {tiers.map((t) => (
           <button
@@ -54,7 +56,7 @@ export function IrregularVerbs() {
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Rechercher un verbe (anglais ou français)…"
+        placeholder={`Rechercher un verbe (${isDutch ? 'néerlandais' : 'anglais'} ou français)…`}
         className="mt-4 w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm dark:border-gray-700 dark:bg-gray-900"
       />
 
@@ -75,7 +77,7 @@ export function IrregularVerbs() {
                 <tr key={v.base} className="border-t border-gray-100 dark:border-gray-800">
                   <td className="px-3 py-2">
                     <p className="font-semibold">{v.base}</p>
-                    <p className="text-[11px] text-gray-500">{v.fr}</p>
+                    <p className="text-[0.6875rem] text-gray-500">{v.fr}</p>
                   </td>
                   <td className="px-2 py-2">{v.past}</td>
                   <td className="px-2 py-2">{v.participle}</td>

@@ -1,22 +1,9 @@
 import { chooseEdition, CHOSEN_EDITION, EDITIONS, type EditionId } from '../edition'
 
-const details: Record<EditionId, { level: string; desc: string; gradient: string }> = {
-  jojo: {
-    level: 'B2 → C1',
-    desc: 'Cours Accent Lang, temps du passé, rédaction, expressions et vocabulaire avancé.',
-    gradient: 'from-indigo-500 via-violet-500 to-fuchsia-500',
-  },
-  jujularage: {
-    level: 'A1 → A2',
-    desc: 'Les bases (present simple, continuous, passé, futur), le vocabulaire du quotidien, la bière, le sport, la biologie et le travail en CDMO.',
-    gradient: 'from-amber-500 via-orange-500 to-indigo-600',
-  },
-}
-
 /** Écran de choix de l'accès (au premier lancement, ou depuis Progrès → Changer d'accès). */
 export function EditionPicker() {
   return (
-    <div className="px-4 pt-10">
+    <div className="px-4 pb-10 pt-10">
       <div className="text-center">
         <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="mx-auto h-20 w-20 rounded-3xl shadow-lg" />
         <h1 className="mt-4 text-3xl font-extrabold tracking-tight">Welcome! 👋</h1>
@@ -26,23 +13,22 @@ export function EditionPicker() {
       <nav aria-label="Choix de l'accès" className="mt-8 space-y-4">
         {(Object.keys(EDITIONS) as EditionId[]).map((id) => {
           const e = EDITIONS[id]
-          const d = details[id]
           return (
             <button
               key={id}
               onClick={() => chooseEdition(id)}
-              className={`block w-full rounded-3xl bg-linear-to-br ${d.gradient} p-5 text-left text-white shadow-lg`}
+              className={`block w-full rounded-3xl bg-linear-to-br ${e.pickerGradient} p-5 text-left text-white shadow-lg`}
             >
               <div className="flex items-center gap-3">
                 <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 text-3xl">{e.icon}</span>
                 <div className="flex-1">
                   <p className="text-2xl font-extrabold">{e.name}</p>
-                  <p className="text-sm font-bold text-white/90">{d.level}</p>
+                  <p className="text-sm font-bold text-white/90">{e.pickerLevel}</p>
                 </div>
                 {CHOSEN_EDITION === id && <span className="rounded-full bg-white/25 px-2 py-0.5 text-xs font-bold">actuel</span>}
                 <span className="text-3xl font-bold">›</span>
               </div>
-              <p className="mt-3 text-sm text-white/90">{d.desc}</p>
+              <p className="mt-3 text-sm text-white/90">{e.pickerBlurb}</p>
             </button>
           )
         })}

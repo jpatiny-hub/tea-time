@@ -4,6 +4,7 @@ import { modules } from '../data/modules'
 import { sessions } from '../data/sessions/index'
 import { vocabCard } from '../data/content'
 import { synonymExercises } from '../data/style'
+import { EDITION } from '../edition'
 import { updateProgress, useProgress, type Settings } from '../lib/store'
 import { dueIds, masteredCount, newIds } from '../lib/progress'
 import { shuffle } from '../lib/text'
@@ -11,13 +12,15 @@ import type { CardExercise, VocabItem } from '../types'
 import { ExerciseRunner } from '../components/ExerciseRunner'
 import { btnPrimary, btnSecondary, ListLink, Page, ProgressBar, Section } from '../components/ui'
 
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
 export function toCards(items: VocabItem[], direction: Settings['cardDirection']): CardExercise[] {
   return items.map((v) => vocabCard(v, direction === 'mixte' ? (Math.random() < 0.5 ? 'en-fr' : 'fr-en') : direction))
 }
 
 const directionLabels: Record<Settings['cardDirection'], string> = {
-  'en-fr': 'Anglais → français',
-  'fr-en': 'Français → anglais',
+  'en-fr': `${cap(EDITION.langName)} → français`,
+  'fr-en': `Français → ${EDITION.langName}`,
   mixte: 'Mélangé',
 }
 
@@ -66,7 +69,7 @@ export function Vocabulary() {
           </button>
         ))}
       </div>
-      <p className="mt-1 text-center text-[11px] text-gray-400">Français → anglais = plus difficile, mais c'est ce qui fait progresser à l'oral.</p>
+      <p className="mt-1 text-center text-[0.6875rem] text-gray-400">Français → {EDITION.langName} = plus difficile, mais c'est ce qui fait progresser à l'oral.</p>
 
       {sessions.length > 0 && <Section title="Par module de cours">
         {modules.map((m) => {

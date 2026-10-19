@@ -143,7 +143,7 @@ const levelColors: Record<Level, string> = {
 }
 
 export function LevelBadge({ level }: { level: Level }) {
-  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-extrabold ${levelColors[level]}`}>{level}</span>
+  return <span className={`rounded-full px-2 py-0.5 text-[0.625rem] font-extrabold ${levelColors[level]}`}>{level}</span>
 }
 
 export function Pill({ children, tone = 'gray' }: { children: ReactNode; tone?: 'gray' | 'indigo' | 'green' | 'red' | 'amber' }) {

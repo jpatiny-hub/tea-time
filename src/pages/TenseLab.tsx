@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import { isJuju } from '../edition'
+import { isDutch } from '../edition'
+import { extra } from '../data/edition-content'
 import { irregularVerbs } from '../data/irregular-verbs'
 import { grammarLessons } from '../data/grammar'
 import { TAG_LABELS, TENSE_TAGS } from '../data/content'
@@ -30,12 +31,12 @@ export function TenseLab() {
   })
 
   return (
-    <Page title="⏳ Labo des temps" subtitle={isJuju ? 'Le présent (simple et continuous), le passé et le futur : des fiches simples, des exercices et tes statistiques.' : 'Ta priorité : le passé (past simple, present perfect, past perfect) et le futur. Du cours, des exercices, et des statistiques pour voir tes progrès.'}>
+    <Page title={isDutch ? '⏳ Les verbes' : '⏳ Labo des temps'} subtitle={extra ? extra.ui.tenseLabSubtitle : 'Ta priorité : le passé (past simple, present perfect, past perfect) et le futur. Du cours, des exercices, et des statistiques pour voir tes progrès.'}>
       <div className="grid grid-cols-2 gap-3">
-        <Link to={isJuju ? '/entrainement?tag=present&n=15' : '/entrainement?tag=pp-vs-ps&n=15'} className="block rounded-3xl bg-linear-to-br from-amber-400 to-orange-500 p-4 text-white shadow-md shadow-orange-500/25 dark:shadow-none">
+        <Link to={extra ? `/entrainement?tag=${extra.ui.challenge.tag}&n=15` : '/entrainement?tag=pp-vs-ps&n=15'} className="block rounded-3xl bg-linear-to-br from-amber-400 to-orange-500 p-4 text-white shadow-md shadow-orange-500/25 dark:shadow-none">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/25 text-2xl">🥊</span>
-          <p className="mt-2.5 font-extrabold leading-tight">{isJuju ? 'Present simple ou continuous ?' : 'Past simple ou present perfect ?'}</p>
-          <p className="text-xs opacity-90">{isJuju ? 'Habitude ou maintenant ?' : 'Le duel n°1 des francophones'}</p>
+          <p className="mt-2.5 font-extrabold leading-tight">{extra ? extra.ui.challenge.title : 'Past simple ou present perfect ?'}</p>
+          <p className="text-xs opacity-90">{extra ? extra.ui.challenge.sub : 'Le duel n°1 des francophones'}</p>
         </Link>
         <Link to="/entrainement?tags=tenses&n=20" className={cardLink}>
           <IconTile icon="🎲" />
@@ -44,14 +45,16 @@ export function TenseLab() {
         </Link>
         <Link to="/temps/verbes" className={cardLink}>
           <IconTile icon="📜" />
-          <p className="mt-2.5 font-extrabold leading-tight">Verbes irréguliers</p>
+          <p className="mt-2.5 font-extrabold leading-tight">{extra ? extra.ui.verbsTitle : 'Verbes irréguliers'}</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">{irregularVerbs.length} verbes, par niveau</p>
         </Link>
-        <Link to={isJuju ? '/pratique/ecrit/jj-w-weekend' : '/pratique/ecrit/w-weekend-story'} className={cardLink}>
+        {(!extra || extra.ui.writingTaskId) && (
+        <Link to={extra ? `/pratique/ecrit/${extra.ui.writingTaskId}` : '/pratique/ecrit/w-weekend-story'} className={cardLink}>
           <IconTile icon="🖋️" />
           <p className="mt-2.5 font-extrabold leading-tight">Raconter au passé</p>
           <p className="text-xs text-gray-500 dark:text-gray-400">Rédaction guidée</p>
         </Link>
+        )}
       </div>
 
       <Section title="Les leçons, dans l'ordre">
@@ -94,7 +97,7 @@ export function TenseLab() {
         </div>
       </Section>
 
-      <Section title="Aide-mémoire">
+      {!extra && <Section title="Aide-mémoire">
         <div className="space-y-2">
           {cheatSheet.map((c) => (
             <div key={c.tense} className={`${card} p-3`}>
@@ -108,7 +111,7 @@ export function TenseLab() {
             </div>
           ))}
         </div>
-      </Section>
+      </Section>}
     </Page>
   )
 }

@@ -7,6 +7,8 @@ import { answerXp, levelInfo, perfectBonus, type AnswerQuality } from '../lib/xp
 import { canSpeak, speak } from '../lib/speech'
 import { TAG_LABELS } from '../data/content'
 import { btnPrimary, btnSecondary, card, hero, input, LevelBadge, Pill, SpeakButton } from './ui'
+import { EDITION } from '../edition'
+import type { AnswerCheck } from '../lib/text'
 
 interface Result {
   exercise: Exercise
@@ -31,6 +33,7 @@ const kindLabel: Record<Exercise['kind'], string> = {
   fix: 'Corrige la phrase',
   transform: 'Réécriture',
   card: 'Vocabulaire',
+  cloze: 'Texte à trous',
 }
 
 export function ExerciseRunner({ items, title, onExit, onFinish, record = true }: Props) {
@@ -42,6 +45,9 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
   const [verdict, setVerdict] = useState<AnswerVerdict | null>(null)
   const [closest, setClosest] = useState('')
   const [override, setOverride] = useState(false)
+  // Texte à trous : une saisie par trou, et le verdict de chaque trou après vérification.
+  const [blanks, setBlanks] = useState<string[]>([])
+  const [blankResults, setBlankResults] = useState<AnswerCheck[]>([])
   const [results, setResults] = useState<Result[]>([])
   const [done, setDone] = useState(false)
   const [round, setRound] = useState(0)
@@ -62,6 +68,8 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
     if (!ex) return
     setPhase('answer')
     setText(ex.kind === 'fix' ? ex.wrong : '')
+    setBlanks(ex.kind === 'cloze' ? ex.blanks.map(() => '') : [])
+    setBlankResults([])
     setChoice(null)
     setVerdict(null)
     setClosest('')
@@ -91,10 +99,16 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
       setClosest(ex.options[ex.answer])
     } else if (ex.kind === 'gap' || ex.kind === 'fix' || ex.kind === 'transform') {
       if (!text.trim()) return
-      const res = checkAnswer(text, ex.answers)
+      const res = checkAnswer(text, ex.answers, ex.kind === 'fix' ? ex.wrong : undefined)
       setVerdict(res.verdict)
       setClosest(res.closest)
       if (canSpeak() && res.verdict !== 'wrong' && ex.kind !== 'gap') speak(res.closest)
+    } else if (ex.kind === 'cloze') {
+      if (blanks.every((b) => !b.trim())) return
+      const res = ex.blanks.map((accepted, i) => checkAnswer(blanks[i] ?? '', accepted))
+      setBlankResults(res)
+      setVerdict(res.some((r) => r.verdict === 'wrong') ? 'wrong' : res.some((r) => r.verdict === 'typo') ? 'typo' : 'correct')
+      setClosest(res.map((r) => r.closest).join(' / '))
     } else if (ex.kind === 'card') {
       if (!text.trim()) return
       const res = checkVocab(text, ex.back)
@@ -124,7 +138,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
     setCombo(nextCombo)
     const nextSessionXp = sessionXp + xp
     setSessionXp(nextSessionXp)
-    const given = ex.kind === 'mcq' ? (choice !== null ? ex.options[choice] : '') : text
+    const given = ex.kind === 'mcq' ? (choice !== null ? ex.options[choice] : '') : ex.kind === 'cloze' ? blanks.join(' / ') : text
     const nextResults = [...results, { exercise: ex, ok, given }]
     setResults(nextResults)
     if (index + 1 < queue.length) {
@@ -263,6 +277,10 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
               </div>
             )}
 
+            {ex.kind === 'cloze' && (
+              <ClozeView ex={ex} blanks={blanks} onChange={setBlanks} phase={phase} results={blankResults} override={override} inputRef={inputRef} onSubmit={() => phase === 'answer' && check()} />
+            )}
+
             {(ex.kind === 'gap' || ex.kind === 'fix' || ex.kind === 'transform') && (
               ex.kind === 'gap' ? (
                 <input
@@ -290,7 +308,8 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
                   }}
                   disabled={phase === 'feedback'}
                   rows={3}
-                  placeholder={ex.kind === 'fix' ? 'Corrige directement la phrase…' : 'Écris ta phrase en anglais…'}
+                  placeholder={ex.kind === 'fix' ? 'Corrige directement la phrase…' : `Écris ta phrase en ${EDITION.langName}…`}
+                  lang={EDITION.lang}
                   autoCapitalize="sentences"
                   autoCorrect="off"
                   spellCheck={false}
@@ -305,7 +324,11 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
           <CardFeedback ex={ex} ok={isOk} verdict={verdict} override={override} given={text} onOverride={() => setOverride(true)} />
         )}
 
-        {phase === 'feedback' && ex.kind !== 'card' && (
+        {phase === 'feedback' && ex.kind === 'cloze' && (
+          <ClozeFeedback ex={ex} ok={isOk} verdict={verdict} override={override} results={blankResults} onOverride={() => setOverride(true)} />
+        )}
+
+        {phase === 'feedback' && ex.kind !== 'card' && ex.kind !== 'cloze' && (
           <Feedback ex={ex} ok={isOk} verdict={verdict} override={override} closest={closest} given={text} onOverride={() => setOverride(true)} />
         )}
       </div>
@@ -317,7 +340,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
           )}
           <button
             onClick={check}
-            disabled={ex.kind === 'mcq' ? choice === null : !text.trim()}
+            disabled={ex.kind === 'mcq' ? choice === null : ex.kind === 'cloze' ? blanks.every((b) => !b.trim()) : !text.trim()}
             className={btnPrimary}
           >
             Vérifier
@@ -456,7 +479,7 @@ function CardView({
   return (
     <div className="mt-3">
       <div className="flex flex-col items-center rounded-2xl bg-gray-50 p-5 text-center dark:bg-gray-800/60">
-        <span className="text-xs text-gray-400">{toFrench ? 'Traduis en français' : 'Traduis en anglais'}</span>
+        <span className="text-xs text-gray-400">{toFrench ? 'Traduis en français' : `Traduis en ${EDITION.langName}`}</span>
         <span className="mt-2 text-2xl font-bold">{ex.front}</span>
         {toFrench && ex.example && phase === 'answer' && (
           <span className="mt-2 text-sm italic text-gray-500 dark:text-gray-400">« {ex.example} »</span>
@@ -469,8 +492,8 @@ function CardView({
         onChange={(e) => onText(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
         disabled={phase === 'feedback'}
-        placeholder={toFrench ? 'En français…' : 'In English…'}
-        lang={toFrench ? 'fr' : 'en'}
+        placeholder={toFrench ? 'En français…' : EDITION.lang === 'nl' ? 'In het Nederlands…' : 'In English…'}
+        lang={toFrench ? 'fr' : EDITION.lang}
         autoCapitalize="none"
         autoCorrect="off"
         autoComplete="off"
@@ -523,6 +546,118 @@ function CardFeedback({
   )
 }
 
+function fillBlanks(text: string, answers: string[]): string {
+  let i = 0
+  return text.replace(/___/g, () => answers[i++] ?? '___')
+}
+
+/** Texte à trous : le texte avec un champ à la place de chaque `___`. */
+function ClozeView({
+  ex, blanks, onChange, phase, results, override, inputRef, onSubmit,
+}: {
+  ex: Extract<Exercise, { kind: 'cloze' }>
+  blanks: string[]
+  onChange: (b: string[]) => void
+  phase: Phase
+  results: AnswerCheck[]
+  override: boolean
+  inputRef: React.RefObject<HTMLTextAreaElement & HTMLInputElement | null>
+  onSubmit: () => void
+}) {
+  const parts = ex.text.split('___')
+  const checked = phase === 'feedback'
+  return (
+    <div className="mt-3">
+      <p className="whitespace-pre-line text-lg leading-[2.6rem]">
+        {parts.map((part, i) => {
+          const accepted = ex.blanks[i]
+          const verdict = results[i]?.verdict
+          const bad = checked && !override && verdict === 'wrong'
+          const good = checked && (override || verdict === 'correct' || verdict === 'typo')
+          const width = Math.max(4, Math.min(16, Math.max(...(accepted ?? ['xxxx']).map((a) => a.length)) + 2))
+          return (
+            <span key={i}>
+              {part}
+              {i < parts.length - 1 && (
+                <input
+                  ref={i === 0 ? (inputRef as React.RefObject<HTMLInputElement>) : undefined}
+                  value={blanks[i] ?? ''}
+                  onChange={(e) => onChange(blanks.map((b, j) => (j === i ? e.target.value : b)))}
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter') return
+                    const next = e.currentTarget.closest('p')?.querySelectorAll('input')[i + 1]
+                    if (next) (next as HTMLInputElement).focus()
+                    else onSubmit()
+                  }}
+                  disabled={checked}
+                  aria-label={`Trou ${i + 1}`}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  spellCheck={false}
+                  lang={EDITION.lang}
+                  style={{ width: `${width}ch` }}
+                  className={`mx-1 inline-block rounded-lg border-0 border-b-2 bg-indigo-50/60 px-1 py-0.5 text-center text-base font-semibold outline-none focus:bg-indigo-100/70 dark:bg-white/5 ${
+                    bad ? 'border-red-500 text-red-600' : good ? 'border-green-500 text-green-700 dark:text-green-400' : 'border-indigo-400'
+                  }`}
+                />
+              )}
+            </span>
+          )
+        })}
+      </p>
+      {ex.hint && <p className="mt-1 text-xs italic text-gray-400">Indice : {ex.hint}</p>}
+    </div>
+  )
+}
+
+function ClozeFeedback({
+  ex, ok, verdict, override, results, onOverride,
+}: {
+  ex: Extract<Exercise, { kind: 'cloze' }>
+  ok: boolean
+  verdict: AnswerVerdict | null
+  override: boolean
+  results: AnswerCheck[]
+  onOverride: () => void
+}) {
+  const wrong = results.map((r, i) => ({ r, i })).filter(({ r }) => r.verdict === 'wrong')
+  const typos = results.filter((r) => r.verdict === 'typo')
+  const rightCount = results.filter((r) => r.verdict !== 'wrong').length
+  return (
+    <div className="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+      {ok ? (
+        <p className="font-semibold text-green-600">✓ {override ? 'Validé' : verdict === 'typo' ? "Correct — attention à l'orthographe" : 'Correct !'}</p>
+      ) : (
+        <p className="font-semibold text-red-600">✗ {rightCount} / {results.length} trous justes</p>
+      )}
+      {!ok && wrong.length > 0 && (
+        <ul className="mt-2 space-y-1 text-sm">
+          {wrong.map(({ r, i }) => (
+            <li key={i}>
+              <span className="text-gray-500 dark:text-gray-400">Trou {i + 1} : </span>
+              <span className="font-semibold">{r.closest}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {(ok && verdict === 'typo') && typos.length > 0 && (
+        <p className="mt-2 text-sm">Orthographe attendue : {typos.map((t) => t.closest).join(', ')}</p>
+      )}
+      <div className="mt-2 flex items-start justify-between gap-2">
+        <p className="text-sm italic text-gray-600 dark:text-gray-300">{fillBlanks(ex.text, ex.blanks.map((b) => b[0]))}</p>
+        <SpeakButton text={fillBlanks(ex.text, ex.blanks.map((b) => b[0]))} small />
+      </div>
+      {ex.explanation && <p className="mt-3 rounded-2xl bg-indigo-50 p-3 text-sm text-indigo-900 dark:bg-indigo-900/30 dark:text-indigo-100">💡 {ex.explanation}</p>}
+      {!ok && (
+        <button onClick={onOverride} className="mt-3 text-xs text-indigo-600 underline dark:text-indigo-400">
+          Mes réponses étaient correctes (formulation différente)
+        </button>
+      )}
+    </div>
+  )
+}
+
 function splitGap(prompt: string): [string, string] {
   const i = prompt.indexOf('___')
   return i < 0 ? [prompt, ''] : [prompt.slice(0, i), prompt.slice(i + 3)]
@@ -540,6 +675,7 @@ export function promptOf(ex: Exercise): string {
     case 'fix': return `✗ ${ex.wrong}`
     case 'transform': return ex.prompt
     case 'card': return ex.front
+    case 'cloze': return ex.text
   }
 }
 
@@ -550,6 +686,7 @@ export function answerOf(ex: Exercise): string {
     case 'fix': return ex.answers[0]
     case 'transform': return ex.answers[0]
     case 'card': return ex.back
+    case 'cloze': return fillBlanks(ex.text, ex.blanks.map((b) => b[0]))
   }
 }
 

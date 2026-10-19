@@ -1,6 +1,5 @@
 import type { Dialogue } from '../types'
-import { isJuju } from '../edition.ts'
-import { jujuDialogues } from './juju/texts.ts'
+import { extra } from './edition-content.ts'
 
 // Dialogues originaux lus par la synthèse vocale (voix alternées quand le téléphone en a plusieurs).
 const jojoDialogues: Dialogue[] = [
@@ -206,4 +205,4 @@ const jojoDialogues: Dialogue[] = [
 ]
 
 // Accès en cours (voir src/edition.ts).
-export const dialogues: Dialogue[] = isJuju ? jujuDialogues : jojoDialogues
+export const dialogues: Dialogue[] = extra ? extra.dialogues : jojoDialogues

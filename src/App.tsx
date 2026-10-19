@@ -29,9 +29,11 @@ import { Drill } from './pages/Drill'
 import { ThemeDetail, Themes } from './pages/Themes'
 import { EditionPicker } from './pages/EditionPicker'
 import { Translation } from './pages/Translation'
+import { TypedExercises } from './pages/TypedExercises'
 import { CHOSEN_EDITION } from './edition'
 import { useProgress } from './lib/store'
 import { syncReminderState } from './lib/reminder'
+import { applyAppearance } from './lib/appearance'
 import { todayKey } from './lib/text'
 
 function ScrollToTop() {
@@ -89,6 +91,20 @@ function ReminderSync() {
   return null
 }
 
+// Apparence (clair / sombre / automatique) et taille du texte : réglages de l'accès en cours.
+function Appearance() {
+  const { theme, fontScale } = useProgress().settings
+  useEffect(() => {
+    applyAppearance({ theme, fontScale })
+    if (theme !== 'auto') return
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = () => applyAppearance({ theme, fontScale })
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [theme, fontScale])
+  return null
+}
+
 // Palette daltonienne : réglage de l'accès en cours, appliqué à toute la page.
 function ColorBlindMode() {
   const on = useProgress().settings.colorBlind
@@ -106,6 +122,7 @@ function App() {
     <div className="mx-auto flex min-h-screen max-w-md flex-col bg-(--app-bg) text-gray-900 dark:text-gray-100">
       <ScrollToTop />
       <RecoveredToast />
+      <Appearance />
       <ColorBlindMode />
       {!picking && <ReminderSync />}
       <main className="flex-1 pb-28">
@@ -126,6 +143,7 @@ function App() {
           <Route path="/pratique/corrections" element={<Corrections />} />
           <Route path="/pratique/reformulation" element={<Reformulation />} />
           <Route path="/pratique/traduction" element={<Translation />} />
+          <Route path="/pratique/exercices" element={<TypedExercises />} />
           <Route path="/pratique/ecrit" element={<Writing />} />
           <Route path="/pratique/ecrit/:taskId" element={<WritingStudio />} />
           <Route path="/pratique/oral" element={<Speaking />} />

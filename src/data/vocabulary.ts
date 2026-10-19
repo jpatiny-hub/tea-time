@@ -1,8 +1,7 @@
 import type { VocabDeck, VocabItem } from '../types'
 import { sessions } from './sessions/index.ts'
 import { formatDateFr } from '../lib/text.ts'
-import { isJuju } from '../edition.ts'
-import { jujuDecks } from './juju/vocabulary.ts'
+import { extra } from './edition-content.ts'
 
 // ---------------------------------------------------------------------------
 // Paquets « Découverte » : du vocabulaire nouveau pour élargir au-delà des cours.
@@ -298,7 +297,7 @@ const jojoDecks: VocabDeck[] = [
   { id: 'halloween-idioms', title: 'Halloween : les expressions', icon: '👻', description: 'Skeleton staff, graveyard shift, ghosting… des expressions « qui font peur » utiles au travail.', kind: 'decouverte', items: halloweenIdioms },
 ]
 
-export const discoveryDecks: VocabDeck[] = isJuju ? jujuDecks : jojoDecks
+export const discoveryDecks: VocabDeck[] = extra ? extra.decks : jojoDecks
 
 // Un paquet par séance de cours, généré automatiquement.
 export const courseDecks: VocabDeck[] = sessions

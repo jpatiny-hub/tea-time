@@ -3,10 +3,9 @@ import { tenseLessons } from './grammar-tenses.ts'
 import { structureLessons } from './grammar-structures.ts'
 import { wordLessons } from './grammar-words.ts'
 import { styleLessons } from './grammar-style.ts'
-import { isJuju } from '../edition.ts'
-import { jujuGrammarGroups, jujuGrammarLessons } from './juju/grammar.ts'
+import { extra } from './edition-content.ts'
 
-export const grammarLessons: GrammarLesson[] = (isJuju ? jujuGrammarLessons : [
+export const grammarLessons: GrammarLesson[] = (extra ? extra.grammarLessons : [
   ...tenseLessons,
   ...structureLessons,
   ...wordLessons,
@@ -20,4 +19,4 @@ const jojoGrammarGroups: { id: GrammarGroup; title: string; icon: string; descri
   { id: 'style', title: 'Style & rédaction', icon: '🖋️', description: 'Connecteurs, registre, mise en relief.' },
 ]
 
-export const grammarGroups: { id: GrammarGroup; title: string; icon: string; description: string }[] = isJuju ? jujuGrammarGroups : jojoGrammarGroups
+export const grammarGroups: { id: GrammarGroup; title: string; icon: string; description: string }[] = extra ? extra.grammarGroups : jojoGrammarGroups

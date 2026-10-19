@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "check-data": "node --experimental-strip-types scripts/check-data.ts && EDITION=jujularage node --experimental-strip-types scripts/check-data.ts",
+    "check-data": "for e in jojo jujularage maman nunu; do EDITION=$e node --experimental-strip-types scripts/check-data.ts || exit 1; done",
     "preview": "vite preview"
   },
   "dependencies": {

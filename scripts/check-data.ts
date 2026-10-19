@@ -41,12 +41,25 @@ function checkExercise(ex: Exercise, where: string) {
       if (ex.answers.some((a) => normalizeForComparison(a) === normalizeForComparison(ex.wrong))) {
         errors.push(`${at} : la phrase fautive est identique à une réponse acceptée`)
       }
+      else if (checkAnswer(ex.wrong, ex.answers, ex.wrong).verdict !== 'wrong') {
+        errors.push(`${at} : la phrase fautive serait acceptée comme correcte`)
+      }
       break
     case 'transform':
       if (ex.answers.length === 0) errors.push(`${at} : aucune réponse`)
       break
     case 'card':
       break
+    case 'cloze': {
+      const holes = ex.text.split('___').length - 1
+      if (holes === 0) errors.push(`${at} : pas de « ___ » dans le texte à trous`)
+      if (holes !== ex.blanks.length) errors.push(`${at} : ${holes} trou(s) mais ${ex.blanks.length} série(s) de réponses`)
+      for (const [i, accepted] of ex.blanks.entries()) {
+        if (accepted.length === 0) errors.push(`${at} : trou ${i + 1} sans réponse`)
+        for (const a of accepted) if (checkAnswer(a, accepted).verdict !== 'correct') errors.push(`${at} : la réponse « ${a} » n'est pas reconnue`)
+      }
+      break
+    }
   }
   if ('answers' in ex) {
     for (const a of ex.answers) {

@@ -44,7 +44,7 @@ export function ReminderSettings({ compact = false }: { compact?: boolean }) {
 
       <div className="mt-3 grid gap-2">
         <button onClick={() => downloadCalendarReminder(reminderHour)} className={btnPrimary}>📅 Ajouter un rappel à mon agenda</button>
-        <p className="-mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+        <p className="-mt-1 text-[0.6875rem] text-gray-500 dark:text-gray-400">
           Le plus fiable : ouvre le fichier téléchargé, puis « Ajouter » dans l'agenda. Une alarme sonnera chaque jour à {reminderHour} h avec le lien de l'appli.
         </p>
         {support !== 'none' && (
@@ -52,7 +52,7 @@ export function ReminderSettings({ compact = false }: { compact?: boolean }) {
             <button onClick={toggle} className={btnSecondary}>
               {reminderEnabled ? '🔕 Désactiver les notifications' : '🔔 Activer les notifications de l\'appli'}
             </button>
-            <p className="-mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+            <p className="-mt-1 text-[0.6875rem] text-gray-500 dark:text-gray-400">
               {isInstalled() ? '' : 'Fonctionne seulement avec l\'appli installée (Android, Chrome). '}
               Chrome choisit le moment exact (une fois par jour au plus, après {reminderHour} h), et ne t'embête pas si tu as déjà fait un exercice ce jour-là.
             </p>

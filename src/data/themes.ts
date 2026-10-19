@@ -1,5 +1,5 @@
 import type { ThemeLesson } from '../types'
-import { isJuju } from '../edition.ts'
+import { extra } from './edition-content.ts'
 
 // ---------------------------------------------------------------------------
 // Thèmes & culture : des leçons autonomes autour d'une fête ou d'un sujet culturel.
@@ -358,7 +358,7 @@ const halloween: ThemeLesson = {
 }
 
 // Les thèmes actuels sont de niveau B2 → C1 : réservés à l'accès Jojo pour l'instant.
-export const themes: ThemeLesson[] = isJuju ? [] : [halloween]
+export const themes: ThemeLesson[] = extra ? [] : [halloween]
 
 /** Le thème de saison (s'il y en a un) à mettre en avant sur l'accueil. */
 export function seasonalTheme(date = new Date()): ThemeLesson | undefined {

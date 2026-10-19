@@ -1,10 +1,11 @@
 import { readingTexts } from '../data/reading'
 import { modules } from '../data/modules'
+import { extra } from '../data/edition-content'
 import { LevelBadge, ListLink, Page } from '../components/ui'
 
 export function Reading() {
   return (
-    <Page title="📰 Lecture" subtitle="Des textes originaux sur les thèmes de tes cours, du B2 au C1. Écoute-les, repère les temps, vérifie ta compréhension." back={{ to: '/pratique', label: 'Pratique' }}>
+    <Page title="📰 Lecture" subtitle={extra ? 'Des textes courts avec glossaire et questions. Écoute-les, repère les mots que tu connais, vérifie ta compréhension.' : 'Des textes originaux sur les thèmes de tes cours, du B2 au C1. Écoute-les, repère les temps, vérifie ta compréhension.'} back={{ to: '/pratique', label: 'Pratique' }}>
       <div className="space-y-2">
         {readingTexts.map((t) => (
           <ListLink

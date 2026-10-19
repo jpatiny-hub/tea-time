@@ -6,15 +6,18 @@
   --font-sans: "Nunito Variable", system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
+/* Le mode sombre ne dépend plus seulement du téléphone : la classe `dark` est posée sur <html>
+   par src/lib/appearance.ts selon le réglage (clair / sombre / automatique). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --app-bg: #f5f3fb;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --app-bg: #0d0e16;
-  }
+html.dark {
+  color-scheme: dark;
+  --app-bg: #0d0e16;
 }
 
 html, body, #root {

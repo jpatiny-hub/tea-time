@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { translationExercises } from '../data/content'
+import { EDITION } from '../edition'
 import { getProgress, useProgress } from '../lib/store'
 import { masteredCount } from '../lib/progress'
 import { pickExercises } from '../lib/select'
@@ -14,7 +15,7 @@ export function Translation() {
   if (run) return <ExerciseRunner items={run} title="Traduction" onExit={() => setRun(null)} />
 
   const ids = translationExercises.map((e) => e.id)
-  const toEn = translationExercises.filter((e) => e.kind === 'transform' && e.instruction.includes('anglais'))
+  const toEn = translationExercises.filter((e) => e.kind === 'transform' && e.instruction.includes(EDITION.langName))
   const toFr = translationExercises.filter((e) => e.kind === 'transform' && e.instruction.includes('français'))
   const mastered = masteredCount(data, ids)
 
@@ -28,8 +29,8 @@ export function Translation() {
         <div className="mt-2"><ProgressBar value={mastered} max={ids.length} tone="green" /></div>
         <button onClick={() => setRun(pickExercises(translationExercises, getProgress(), 10))} className={`${btnPrimary} mt-3`}>Série de 10</button>
         <div className="mt-2 grid grid-cols-2 gap-2">
-          <button onClick={() => setRun(pickExercises(toEn, getProgress(), 10))} className={btnSecondary}>🇫🇷 → 🇬🇧</button>
-          <button onClick={() => setRun(pickExercises(toFr, getProgress(), 10))} className={btnSecondary}>🇬🇧 → 🇫🇷</button>
+          <button onClick={() => setRun(pickExercises(toEn, getProgress(), 10))} className={btnSecondary}>🇫🇷 → {EDITION.lang === 'nl' ? '🇳🇱' : '🇬🇧'}</button>
+          <button onClick={() => setRun(pickExercises(toFr, getProgress(), 10))} className={btnSecondary}>{EDITION.lang === 'nl' ? '🇳🇱' : '🇬🇧'} → 🇫🇷</button>
         </div>
         <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">Si ta traduction est correcte mais différente de la réponse proposée, tu peux la valider toi-même.</p>
       </div>

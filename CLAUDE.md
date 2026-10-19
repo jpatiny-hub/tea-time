@@ -2,15 +2,20 @@
 
 Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisateur est francophone (région de Liège), niveau B2, vise le C1, travaille en biologie / industrie pharmaceutique. Grosses lacunes sur les temps du passé (past simple vs present perfect surtout). Interface en français, contenu en anglais.
 
-## Deux accès (éditions) : Jojo et Jujularage
+## Quatre accès (éditions) : Jojo, Jujularage, Maman et Nunu
 
-- `src/edition.ts` : l'accès est choisi au premier lancement (écran `EditionPicker`, ou lien `…/?acces=jujularage`), mémorisé dans `english-app:edition`, modifiable dans Progrès → Réglages (route `/acces`). Changer d'accès recharge la page.
+- `src/edition.ts` : l'accès est choisi au premier lancement (écran `EditionPicker`, ou lien `…/?acces=jujularage|maman|nunu`), mémorisé dans `english-app:edition`, modifiable dans Progrès → Réglages (route `/acces`). Changer d'accès recharge la page.
 - **Jojo** (l'utilisateur, B2 → C1) : tout le contenu historique, progression dans `english-app:progress` (clé inchangée).
 - **Jujularage** (A1 → A2, ami de l'utilisateur, daltonien deutéranope) : contenu dans `src/data/juju/` (grammaire, paquets, modules `jj-*`, textes, traductions, prononciation, changelog séparé), progression dans `english-app:jujularage:progress`. Intérêts : bière / zythologie, sport, biologie, travail en CDMO (production de plasmides), animaux, maison. Ids préfixés `jj-` / `jv-`.
 - Chaque fichier de `src/data/` exporte la version de l'accès en cours (`isJuju ? … : …`) : les pages n'ont pas à s'en soucier ; elles masquent ce qui est vide (séances, corrections, reformulation, thèmes).
 - Parcours « Lexie 👶 » (fille de Jujularage, tout-petit) : `src/data/juju/lexie.ts`, modules `jj-lexie-1..6` avec `group` (affichés à part dans Cours), paquets `lx-deck-*`, ids `lx-*`. Phrases simples (A1–A2) qu'un parent dit à un bébé, avec variantes UK / US.
 - Mode daltonien (`settings.colorBlind`, `html[data-colorblind]` dans `index.css`) : remappe vert → bleu, rouge / rose → orange. Actif par défaut pour Jujularage. Ne jamais transmettre une information par la seule couleur (garder ✓ / ✗, textes).
-- `npm run check-data` valide les DEUX accès (`EDITION=jujularage`).
+- **Maman** (anglais A1 → A2, lien `?acces=maman`) : contenu dans `src/data/maman/` (grammaire, 14 thèmes `mm-*` répartis en `themes-1..3`, textes, extra, index). **Nunu** (néerlandais depuis zéro, lien `?acces=nunu`) : `src/data/nunu/` (leçons `nn-g-*`, 14 thèmes `nn-*` en `themes-1..3`, textes, extra, index). Thème clair par défaut pour ces deux accès.
+- Les thèmes se fabriquent avec `src/data/theme-builder.ts` (`buildTheme`) : un thème = module de cours + paquet de mots + exercices mêlés (`tr`/`back`/`gap`/`fix`/`cloze`/`mcq`). **Les ids d'exercices viennent de la position : n'ajouter qu'À LA FIN, ne jamais insérer ni réordonner.**
+- Néerlandais : le champ `en` des données contient le texte néerlandais (convention conservée pour ne pas dupliquer les composants) ; `NL` dans `lib/text.ts` active la normalisation adaptée.
+- Type d'exercice `cloze` (texte à trous à plusieurs trous) ; pour `fix`, le paramètre `wrong` de `checkAnswer` empêche d'accepter la phrase fautive comme « faute de frappe ».
+- Réglages d'apparence (`lib/appearance.ts`) : thème clair / sombre / auto et taille du texte (Normal / Grand / Très grand), dans Progrès → Réglages.
+- `npm run check-data` valide les QUATRE accès (`EDITION=jojo|jujularage|maman|nunu`).
 - Rappel quotidien sans serveur : `src/lib/reminder.ts` (fichier .ics + periodic background sync) et `public/reminder-sw.js` (chargé dans le service worker via `workbox.importScripts`, état lu dans IndexedDB `english-app-reminder`). Pas de push serveur (contraire à la règle « aucun serveur externe »).
 
 ## Règle n°1 : ne jamais casser la progression

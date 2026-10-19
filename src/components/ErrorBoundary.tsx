@@ -50,7 +50,7 @@ export class ErrorBoundary extends Component<Props, State> {
             Recharger l'appli
           </button>
         </div>
-        <p className="mt-5 break-words rounded-xl bg-gray-100 p-3 text-left font-mono text-[11px] text-gray-500 dark:bg-gray-900">
+        <p className="mt-5 break-words rounded-xl bg-gray-100 p-3 text-left font-mono text-[0.6875rem] text-gray-500 dark:bg-gray-900">
           {error.message}
         </p>
       </div>

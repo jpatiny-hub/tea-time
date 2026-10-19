@@ -1,6 +1,5 @@
 import type { CourseModule } from '../types'
-import { isJuju } from '../edition.ts'
-import { jujuModules } from './juju/modules.ts'
+import { extra } from './edition-content.ts'
 
 // Les 5 thèmes des cours. Les expressions clés viennent des fiches EN-B2 quand elles existent
 // (keyPhrasesFromCourse: true) ; sinon elles ont été rédigées pour l'appli sur le même modèle.
@@ -888,4 +887,4 @@ const jojoModules: CourseModule[] = [
 ]
 
 // Accès en cours (voir src/edition.ts).
-export const modules: CourseModule[] = isJuju ? jujuModules : jojoModules
+export const modules: CourseModule[] = extra ? extra.modules : jojoModules

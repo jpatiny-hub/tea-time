@@ -8,9 +8,10 @@ import { canSpeak, speak } from '../lib/speech'
 import { formatDateFr, todayKey } from '../lib/text'
 import { clearErrors, readErrors } from '../lib/diagnostics'
 import type { Level } from '../types'
-import { EDITION } from '../edition'
+import { EDITION, isDutch } from '../edition'
+import { FONT_SCALES } from '../lib/appearance'
 import { ReminderSettings } from '../components/ReminderSettings'
-import { levelInfo, RANKS, xpToNext, ACTIVITY_XP } from '../lib/xp'
+import { levelInfo, RANK_LIST, xpToNext, ACTIVITY_XP } from '../lib/xp'
 import { btnPrimary, btnSecondary, card, LevelBadge, Page, ProgressBar, Section } from '../components/ui'
 
 const LEVELS: Level[] = EDITION.levels
@@ -116,7 +117,7 @@ export function Progress() {
               </div>
             )
           })}
-          <p className="text-[11px] text-gray-400">« Acquis » = réussi au moins 3 fois de suite à intervalles croissants.</p>
+          <p className="text-[0.6875rem] text-gray-400">« Acquis » = réussi au moins 3 fois de suite à intervalles croissants.</p>
         </div>
       </Section>
 
@@ -147,6 +148,27 @@ export function Progress() {
             <Link to="/acces" className="shrink-0 rounded-xl bg-gray-100 px-3 py-2 text-sm font-semibold dark:bg-gray-800">Changer</Link>
           </div>
           <ReminderSettings />
+          <div>
+            <p className="text-sm font-semibold">Apparence</p>
+            <div className="mt-1 flex gap-2">
+              {([['light', '☀️ Clair'], ['dark', '🌙 Sombre'], ['auto', '📱 Selon le téléphone']] as const).map(([id, label]) => (
+                <button key={id} onClick={() => setSetting('theme', id)} className={`flex-1 rounded-xl py-2 text-xs font-semibold ${data.settings.theme === id ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Taille du texte</p>
+            <div className="mt-1 flex gap-2">
+              {FONT_SCALES.map((f, i) => (
+                <button key={f.id} onClick={() => setSetting('fontScale', f.id)} aria-label={f.label} className={`flex-1 rounded-xl py-2 font-bold ${data.settings.fontScale === f.id ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>
+                  <span style={{ fontSize: `${0.85 + i * 0.2}rem` }}>Aa</span>
+                  <span className="block text-[0.65rem] font-semibold opacity-80">{f.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <label className="flex items-center justify-between gap-3">
             <span>
               <span className="block text-sm font-semibold">Mode daltonien (deutéranopie)</span>
@@ -157,9 +179,9 @@ export function Progress() {
           <div>
             <p className="text-sm font-semibold">Accent de la voix</p>
             <div className="mt-1 flex gap-2">
-              {(['en-GB', 'en-US'] as const).map((a) => (
+              {(isDutch ? (['nl-BE', 'nl-NL'] as const) : (['en-GB', 'en-US'] as const)).map((a) => (
                 <button key={a} onClick={() => setSetting('accent', a)} className={`flex-1 rounded-xl py-2 text-sm font-semibold ${data.settings.accent === a ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800'}`}>
-                  {a === 'en-GB' ? '🇬🇧 Britannique' : '🇺🇸 Américain'}
+                  {{ 'en-GB': '🇬🇧 Britannique', 'en-US': '🇺🇸 Américain', 'nl-BE': '🇧🇪 Belge (flamand)', 'nl-NL': '🇳🇱 Pays-Bas' }[a]}
                 </button>
               ))}
             </div>
@@ -167,7 +189,7 @@ export function Progress() {
           <div>
             <p className="text-sm font-semibold">Vitesse de lecture : {data.settings.rate.toFixed(2)}</p>
             <input type="range" min={0.6} max={1.2} step={0.05} value={data.settings.rate} onChange={(e) => setSetting('rate', Number(e.target.value))} className="w-full accent-indigo-600" />
-            {canSpeak() && <button onClick={() => speak('This is how I sound. Have you ever been to London?')} className="text-xs text-indigo-600">🔊 Tester</button>}
+            {canSpeak() && <button onClick={() => speak(isDutch ? 'Zo klink ik. Ben je al eens in Brugge geweest?' : 'This is how I sound. Have you ever been to London?')} className="text-xs text-indigo-600">🔊 Tester</button>}
           </div>
           <div>
             <p className="text-sm font-semibold">Nouveaux mots par session : {data.settings.newCardsPerSession}</p>
@@ -209,7 +231,7 @@ export function Progress() {
         <Section title="🩺 Diagnostic technique">
           <div className={`${card} space-y-2`}>
             <p className="text-xs text-gray-500">Problèmes d'affichage détectés sur cet appareil. Copie-les et envoie-les pour qu'ils soient corrigés.</p>
-            <ul className="max-h-48 space-y-1 overflow-y-auto font-mono text-[11px] text-gray-600 dark:text-gray-300">
+            <ul className="max-h-48 space-y-1 overflow-y-auto font-mono text-[0.6875rem] text-gray-600 dark:text-gray-300">
               {[...diag].reverse().map((e, i) => (
                 <li key={i}>{e.at.slice(0, 16).replace('T', ' ')} · {e.page || '#/'} · {e.message}</li>
               ))}
@@ -258,8 +280,8 @@ function XpSection({ xp, xpByDay }: { xp: number; xpByDay: Record<string, number
         </div>
         <p className="mt-1 text-right text-xs text-gray-500 dark:text-gray-400">{info.into} / {info.needed} XP · total {xp} XP</p>
         <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-          <div className="rounded-2xl bg-amber-50 p-2 dark:bg-amber-500/10"><p className="text-lg font-extrabold">+{today}</p><p className="text-[11px] text-gray-500 dark:text-gray-400">XP aujourd'hui</p></div>
-          <div className="rounded-2xl bg-amber-50 p-2 dark:bg-amber-500/10"><p className="text-lg font-extrabold">+{week}</p><p className="text-[11px] text-gray-500 dark:text-gray-400">XP sur 7 jours</p></div>
+          <div className="rounded-2xl bg-amber-50 p-2 dark:bg-amber-500/10"><p className="text-lg font-extrabold">+{today}</p><p className="text-[0.6875rem] text-gray-500 dark:text-gray-400">XP aujourd'hui</p></div>
+          <div className="rounded-2xl bg-amber-50 p-2 dark:bg-amber-500/10"><p className="text-lg font-extrabold">+{week}</p><p className="text-[0.6875rem] text-gray-500 dark:text-gray-400">XP sur 7 jours</p></div>
         </div>
       </div>
 
@@ -280,10 +302,10 @@ function XpSection({ xp, xpByDay }: { xp: number; xpByDay: Record<string, number
       <details className={card}>
         <summary className="flex cursor-pointer items-center justify-between font-bold">Les grades <span className="text-gray-400">▾</span></summary>
         <ul className="mt-2 space-y-1.5">
-          {RANKS.map((r) => (
+          {RANK_LIST.map((r) => (
             <li key={r.title} className={`flex items-center gap-2 rounded-xl px-2 py-1 text-sm ${r.title === info.rank.title ? 'bg-amber-50 font-bold dark:bg-amber-500/10' : info.level < r.from ? 'opacity-50' : ''}`}>
               <span className="text-xl">{r.icon}</span>
-              <span className="flex-1">{r.title}<span className="block text-[11px] font-normal text-gray-500 dark:text-gray-400">{r.fr}</span></span>
+              <span className="flex-1">{r.title}<span className="block text-[0.6875rem] font-normal text-gray-500 dark:text-gray-400">{r.fr}</span></span>
               <span className="text-xs text-gray-500">niv. {r.from}</span>
             </li>
           ))}

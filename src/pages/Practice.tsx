@@ -1,4 +1,5 @@
 import { allCorrections, translationExercises } from '../data/content'
+import { extra } from '../data/edition-content'
 import { themes } from '../data/themes'
 import { EDITION } from '../edition'
 import { perspectiveExercises, styleExercises, synonymExercises } from '../data/style'
@@ -13,8 +14,11 @@ export function Practice() {
   return (
     <Page title="Pratique" subtitle="Choisis une compétence à travailler.">
       <Section title="Écrire juste">
+        {extra && (
+          <ListLink to="/pratique/exercices" icon="🧩" title="Exercices par type ou par thème" subtitle="Textes à trous, phrases à corriger, à compléter, traductions, questions" />
+        )}
         {translationExercises.length > 0 && (
-          <ListLink to="/pratique/traduction" icon="🔤" title="Petites phrases à traduire" subtitle={`${translationExercises.length} phrases français ↔ anglais, corrigées avec tolérance`} />
+          <ListLink to="/pratique/traduction" icon="🔤" title="Petites phrases à traduire" subtitle={`${translationExercises.length} phrases français ↔ ${EDITION.langName}, corrigées avec tolérance`} />
         )}
         {allCorrections.length > 0 && (
           <ListLink to="/pratique/corrections" icon="🩹" title="Mes erreurs de cours" subtitle={`${allCorrections.length} phrases corrigées en séance, à réécrire sans faute`} />

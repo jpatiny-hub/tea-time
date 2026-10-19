@@ -1,6 +1,5 @@
 import type { PronunciationItem } from '../types'
-import { isJuju } from '../edition.ts'
-import { jujuPronunciation } from './juju/extra.ts'
+import { extra } from './edition-content.ts'
 
 // Mots souvent mal prononcés par les francophones (en plus de ceux vus en cours).
 const jojoExtraPronunciation: PronunciationItem[] = [
@@ -37,4 +36,4 @@ const jojoExtraPronunciation: PronunciationItem[] = [
 ]
 
 // Accès en cours (voir src/edition.ts).
-export const extraPronunciation: PronunciationItem[] = isJuju ? jujuPronunciation : jojoExtraPronunciation
+export const extraPronunciation: PronunciationItem[] = extra ? extra.pronunciation : jojoExtraPronunciation

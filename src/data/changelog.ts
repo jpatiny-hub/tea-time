@@ -1,6 +1,5 @@
 import type { ChangelogEntry } from '../types'
-import { isJuju } from '../edition.ts'
-import { jujuChangelog } from './juju/extra.ts'
+import { extra } from './edition-content.ts'
 
 // Journal des mises à jour de contenu. À chaque ajout, créer une nouvelle entrée avec
 // `version` = précédente + 1 : l'accueil affichera une bannière « Nouveautés ».
@@ -104,6 +103,6 @@ const jojoChangelog: ChangelogEntry[] = [
   },
 ]
 
-export const changelog: ChangelogEntry[] = isJuju ? jujuChangelog : jojoChangelog
+export const changelog: ChangelogEntry[] = extra ? extra.changelog : jojoChangelog
 
 export const CONTENT_VERSION = Math.max(...changelog.map((c) => c.version))

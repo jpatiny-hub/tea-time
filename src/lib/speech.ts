@@ -20,7 +20,9 @@ export function canSpeak() {
 
 function pickVoice(lang: string, variant = 0): SpeechSynthesisVoice | undefined {
   const exact = cachedVoices.filter((v) => v.lang.replace('_', '-') === lang)
-  const pool = exact.length > 0 ? exact : cachedVoices.filter((v) => v.lang.startsWith('en'))
+  // Repli : une voix de la même langue (ex. nl-NL à défaut de nl-BE), puis n'importe quelle voix anglaise.
+  const sameLang = cachedVoices.filter((v) => v.lang.startsWith(lang.slice(0, 2)))
+  const pool = exact.length > 0 ? exact : sameLang
   if (pool.length === 0) return undefined
   return pool[variant % pool.length]
 }

@@ -1,5 +1,6 @@
 import type { IrregularVerb } from '../types'
-import { isJuju } from '../edition.ts'
+import { extra } from './edition-content.ts'
+import { isBasic } from '../edition.ts'
 
 // tier 1 = incontournables, 2 = courants, 3 = avancés
 const allIrregularVerbs: IrregularVerb[] = [
@@ -101,5 +102,5 @@ const allIrregularVerbs: IrregularVerb[] = [
   { base: 'wind', past: 'wound', participle: 'wound', fr: 'enrouler, remonter', tier: 3 },
 ]
 
-// Jujularage (A1 → A2) : les verbes incontournables et courants seulement.
-export const irregularVerbs: IrregularVerb[] = isJuju ? allIrregularVerbs.filter((v) => v.tier < 3) : allIrregularVerbs
+// Accès débutants : les verbes incontournables et courants seulement (ou la liste propre à l'accès).
+export const irregularVerbs: IrregularVerb[] = extra?.irregularVerbs ?? (isBasic ? allIrregularVerbs.filter((v) => v.tier < 3) : allIrregularVerbs)

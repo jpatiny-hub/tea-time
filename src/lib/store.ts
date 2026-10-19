@@ -11,11 +11,13 @@
 import { useSyncExternalStore } from 'react'
 import type { CardState } from './srs'
 import { retroactiveXp } from './xp'
-import { EDITION } from '../edition'
+import { EDITION, type ThemeMode } from '../edition'
 
 // Une clé par accès (Jojo : 'english-app:progress', inchangée depuis le début).
 export const STORAGE_KEY = EDITION.storageKey
 export const SCHEMA_VERSION = 2
+
+export type FontScale = 'normal' | 'large' | 'xlarge'
 
 export interface Attempt {
   ok: number
@@ -37,11 +39,16 @@ export interface WritingEntry {
 }
 
 export interface Settings {
-  accent: 'en-GB' | 'en-US'
+  /** Voix et reconnaissance vocale : accent anglais, ou néerlandais de Belgique / des Pays-Bas pour l'accès Nunu. */
+  accent: 'en-GB' | 'en-US' | 'nl-BE' | 'nl-NL'
   rate: number
   /** Sens des flashcards : anglais → français, français → anglais, ou mélangé. */
   cardDirection: 'en-fr' | 'fr-en' | 'mixte'
   newCardsPerSession: number
+  /** Apparence : clair, sombre, ou selon le téléphone. */
+  theme: ThemeMode
+  /** Taille du texte dans toute l'appli. */
+  fontScale: FontScale
   /** Palette adaptée au daltonisme (deutéranopie) : bleu / orange au lieu de vert / rouge / rose. */
   colorBlind: boolean
   /** Rappel quotidien (notification de l'appli installée). */
@@ -78,10 +85,12 @@ export interface ProgressData {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  accent: 'en-GB',
+  accent: EDITION.speechDefault,
   rate: 0.95,
   cardDirection: 'mixte',
   newCardsPerSession: 10,
+  theme: EDITION.themeDefault,
+  fontScale: 'normal',
   colorBlind: EDITION.colorBlindDefault,
   reminderEnabled: false,
   reminderHour: 19,

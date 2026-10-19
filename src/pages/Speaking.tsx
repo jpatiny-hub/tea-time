@@ -301,7 +301,7 @@ function FreeSpeech({ moduleId }: { moduleId: ModuleId | null }) {
               {hits.map((h, i) => (
                 <p key={i} className="text-xs"><span className="font-mono">{h.excerpt}</span> — {h.message}</p>
               ))}
-              <p className="text-[11px] text-gray-400">La transcription peut elle-même contenir des erreurs de reconnaissance.</p>
+              <p className="text-[0.6875rem] text-gray-400">La transcription peut elle-même contenir des erreurs de reconnaissance.</p>
             </div>
           )}
           {!recording && <button onClick={reset} className={btnSecondary}>Recommencer</button>}

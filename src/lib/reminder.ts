@@ -23,6 +23,16 @@ const MESSAGES: Record<string, { title: string; body: string }[]> = {
     { title: '📚 Keep the streak going!', body: 'Une petite session pour garder ta série de jours ?' },
     { title: '⏳ Past simple or present perfect?', body: 'Viens t\'entraîner 5 minutes au Labo des temps.' },
   ],
+  maman: [
+    { title: '🌼 Hello! Time for a little English', body: 'Quelques minutes d\'anglais aujourd\'hui ? Ta révision t\'attend.' },
+    { title: '☕ A cup of tea and some English?', body: 'Un petit exercice avec ta tasse de thé, ça te dit ?' },
+    { title: '📖 Your English moment', body: 'Un peu chaque jour, c\'est comme ça qu\'on apprend. Viens réviser !' },
+  ],
+  nunu: [
+    { title: '🌷 Tijd voor Nederlands!', body: 'Quelques minutes de néerlandais aujourd\'hui ? Ta révision t\'attend.' },
+    { title: '🧇 Een klein oefeningetje?', body: 'Un petit exercice avec un café, ça te dit ? Stap voor stap !' },
+    { title: '🚲 Goedendag!', body: 'Un peu chaque jour, et bientôt tu parleras avec les enfants. Viens réviser !' },
+  ],
   jujularage: [
     { title: '🍺 Cheers! Time for English', body: '5 minutes d\'anglais aujourd\'hui ? Ta révision t\'attend.' },
     { title: '⚽ Kick-off!', body: 'Petit match d\'anglais du jour : quelques exercices et de l\'XP à gagner.' },
@@ -156,7 +166,7 @@ export function downloadCalendarReminder(hour: number) {
   const date = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`
   const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z')
   const url = appUrl()
-  const title = EDITION.id === 'jujularage' ? '🍺 English time! (Jujularage)' : '🫖 English time!'
+  const title = EDITION.reminderTitle
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',

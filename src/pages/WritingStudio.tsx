@@ -4,7 +4,7 @@ import { writingTasks } from '../data/writing'
 import { updateProgress, useProgress } from '../lib/store'
 import { markStep, recordActivity } from '../lib/progress'
 import { writingXp } from '../lib/xp'
-import { EDITION } from '../edition'
+import { EDITION, isDutch } from '../edition'
 import { lintText } from '../lib/lint'
 import { containsPhrase, countWords, formatDateFr } from '../lib/text'
 import { btnPrimary, btnSecondary, card, LevelBadge, Page, Pill, Section, SpeakButton } from '../components/ui'
@@ -34,7 +34,7 @@ export function WritingStudio() {
     }
   }, [text, taskId, finished])
 
-  const hits = useMemo(() => lintText(text), [text])
+  const hits = useMemo(() => (isDutch ? [] : lintText(text)), [text])
 
   if (!task) return <Page title="Sujet introuvable" back={{ to: '/pratique/ecrit', label: 'Atelier' }}>{null}</Page>
 
@@ -67,7 +67,7 @@ export function WritingStudio() {
 
   async function copyForFeedback() {
     if (!task) return
-    const prompt = `Tu es mon professeur d'anglais. Je suis francophone, niveau ${EDITION.levels[0]}, et je vise le ${EDITION.levels[EDITION.levels.length - 1]}. Adapte tes explications à mon niveau.
+    const prompt = `Tu es mon professeur de ${EDITION.langName}. Je suis francophone, niveau ${EDITION.levels[0]}, et je vise le ${EDITION.levels[EDITION.levels.length - 1]}. Adapte tes explications à mon niveau.
 Voici un texte que j'ai écrit. Sujet : "${task.prompt}"
 
 Merci de :
@@ -161,7 +161,7 @@ ${text}
                 <p className="text-xs text-gray-600 dark:text-gray-300">{h.message}</p>
               </div>
             ))}
-            <p className="text-[11px] text-gray-400">Basé sur les erreurs fréquentes des francophones et celles de tes cours. Ne remplace pas une vraie correction.</p>
+            <p className="text-[0.6875rem] text-gray-400">Basé sur les erreurs fréquentes des francophones et celles de tes cours. Ne remplace pas une vraie correction.</p>
           </div>
         </Section>
       )}

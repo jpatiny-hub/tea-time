@@ -9,8 +9,8 @@ import { allVocab, deckOfVocab } from './vocabulary.ts'
 import { readingTexts } from './reading.ts'
 import { dialogues } from './dialogues.ts'
 import { themes } from './themes.ts'
-import { isJuju } from '../edition.ts'
-import { jujuTranslations } from './juju/extra.ts'
+import { extra } from './edition-content.ts'
+import { isDutch } from '../edition.ts'
 import { formatDateFr } from '../lib/text.ts'
 
 export interface ExerciseSource {
@@ -87,7 +87,35 @@ export const TAG_LABELS: Record<string, string> = {
   questions: 'Les questions',
   translation: 'Traduction',
   imperative: 'Impératif (parler à un enfant)',
+  politeness: 'Politesse',
+  plural: 'Pluriels',
+  adverbs: 'Adverbes',
+  'nl-order': 'Ordre des mots',
+  'de-het': 'De ou het ?',
+  'nl-negation': 'Négation (niet / geen)',
+  'nl-modals': 'Verbes modaux',
+  'nl-separable': 'Verbes à particule séparable',
+  'nl-diminutive': 'Diminutif (-je)',
+  'nl-numbers': 'Nombres et heures',
+  'nl-spelling': 'Orthographe',
+  'nl-pronouns': 'Pronoms',
+  'nl-prepositions': 'Prépositions',
+  'nl-questions': 'Poser des questions',
+  'nl-er': 'Le petit mot « er »',
+  'nl-polite': 'Politesse (je / u)',
+  'nl-sounds': 'Prononciation',
   culture: 'Culture',
+}
+
+// Accès Nunu : les mêmes étiquettes de temps portent les noms néerlandais.
+if (isDutch) {
+  Object.assign(TAG_LABELS, {
+    present: 'Présent (tegenwoordige tijd)',
+    'past-simple': 'Imparfait (verleden tijd)',
+    'present-perfect': 'Passé composé (perfectum)',
+    future: 'Futur (gaan + infinitif)',
+    irregular: 'Verbes irréguliers',
+  })
 }
 
 function withTags(ex: Exercise, extra: string[]): Exercise {
@@ -163,7 +191,7 @@ for (const m of modules) {
 }
 
 /** Petites phrases à traduire (accès Jujularage). */
-export const translationExercises: Exercise[] = isJuju ? jujuTranslations : []
+export const translationExercises: Exercise[] = extra ? extra.translations : []
 
 for (const ex of translationExercises) {
   register(withTags(ex, ['translation']), { label: 'Traduction', link: '/pratique/traduction' })

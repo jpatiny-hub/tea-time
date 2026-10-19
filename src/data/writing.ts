@@ -1,6 +1,5 @@
 import type { WritingTask } from '../types'
-import { isJuju } from '../edition.ts'
-import { jujuWritingTasks } from './juju/texts.ts'
+import { extra } from './edition-content.ts'
 
 const jojoWritingTasks: WritingTask[] = [
   {
@@ -459,4 +458,4 @@ It turned out that it was Paul, the security guard. The storm must have caused a
 ]
 
 // Accès en cours (voir src/edition.ts).
-export const writingTasks: WritingTask[] = isJuju ? jujuWritingTasks : jojoWritingTasks
+export const writingTasks: WritingTask[] = extra ? extra.writingTasks : jojoWritingTasks

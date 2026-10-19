@@ -5,6 +5,7 @@ import { modules } from '../data/modules'
 import { canSpeak, speak } from '../lib/speech'
 import { recordActivity } from '../lib/progress'
 import { ACTIVITY_XP } from '../lib/xp'
+import { EDITION } from '../edition'
 import { checkAnswer, shuffle, wordDiff } from '../lib/text'
 import { btnPrimary, btnSecondary, card, input, LevelBadge, ListLink, Page, Section } from '../components/ui'
 
@@ -23,7 +24,7 @@ export function Listening() {
   if (dictation) return <Dictation sentences={dictation} onExit={() => setDictation(null)} />
 
   return (
-    <Page title="🎧 Écoute & dictée" subtitle="Comprendre l'anglais parlé, et l'écrire sans faute." back={{ to: '/pratique', label: 'Pratique' }}>
+    <Page title="🎧 Écoute & dictée" subtitle={`Comprendre le ${EDITION.langName} parlé, et l'écrire sans faute.`} back={{ to: '/pratique', label: 'Pratique' }}>
       <div className={card}>
         <p className="font-semibold">✍️ Dictée</p>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">

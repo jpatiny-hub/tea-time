@@ -65,7 +65,17 @@ export interface CardExercise extends ExerciseBase {
   speak: string
 }
 
-export type Exercise = McqExercise | GapExercise | FixExercise | TransformExercise | CardExercise
+/** Texte à trous : un court texte avec plusieurs `___`, un champ par trou. Réussi si tous les trous sont justes. */
+export interface ClozeExercise extends ExerciseBase {
+  kind: 'cloze'
+  /** Le texte, avec `___` à chaque trou (dans l'ordre). */
+  text: string
+  /** Réponses acceptées pour chaque trou. */
+  blanks: string[][]
+  hint?: string
+}
+
+export type Exercise = McqExercise | GapExercise | FixExercise | TransformExercise | CardExercise | ClozeExercise
 
 // ---------------------------------------------------------------------------
 // Grammaire

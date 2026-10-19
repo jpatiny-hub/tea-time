@@ -1,6 +1,10 @@
-// Comparaison tolérante des réponses écrites en anglais :
-// casse, ponctuation, apostrophes typographiques, contractions (don't = do not),
+// Comparaison tolérante des réponses écrites en anglais (ou en néerlandais pour l'accès Nunu) :
+// casse, ponctuation, apostrophes typographiques, accents, contractions (don't = do not),
 // orthographe britannique/américaine (organise = organize) et petite faute de frappe.
+// Les règles propres à l'anglais (contractions, UK/US) sont désactivées pour le néerlandais.
+import { EDITION } from '../edition.ts'
+
+const NL = EDITION.lang === 'nl'
 
 const CONTRACTIONS: [RegExp, string][] = [
   [/\bcan't\b/g, 'cannot'],
@@ -44,21 +48,21 @@ export function normalizeForComparison(text: string): string {
     .replace(/[“”«»]/g, '"')
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-  for (const [re, rep] of CONTRACTIONS) t = t.replace(re, rep)
+  if (!NL) for (const [re, rep] of CONTRACTIONS) t = t.replace(re, rep)
   t = t
     .replace(/-/g, ' ')
     .replace(/[^a-z0-9'\s]/g, ' ')
     .replace(/(^|\s)'|'(\s|$)/g, '$1$2')
     .replace(/\s+/g, ' ')
     .trim()
-  for (const [re, rep] of SPELLING) t = t.replace(re, rep)
+  if (!NL) for (const [re, rep] of SPELLING) t = t.replace(re, rep)
   return t
 }
 
 // "'d" peut valoir "would" ou "had" : on génère les deux lectures.
 function variants(text: string): string[] {
   const n = normalizeForComparison(text)
-  if (!n.includes("'d")) return [n]
+  if (NL || !n.includes("'d")) return [n]
   return [n.replace(/'d\b/g, ' would'), n.replace(/'d\b/g, ' had')].map((v) => v.replace(/\s+/g, ' '))
 }
 
@@ -85,7 +89,12 @@ export interface AnswerCheck {
   closest: string
 }
 
-export function checkAnswer(input: string, expected: string[]): AnswerCheck {
+/**
+ * `wrong` : pour une phrase à corriger, la phrase fautive de départ. Si la réponse est plus proche d'elle que de
+ * la bonne réponse (ou aussi proche), ce n'est PAS une faute de frappe : l'erreur n'a pas été corrigée
+ * (ex. « prize » / « price », « hunted » / « haunted » ne diffèrent que d'une lettre).
+ */
+export function checkAnswer(input: string, expected: string[], wrong?: string): AnswerCheck {
   const inputs = variants(input)
   let best = { dist: Infinity, answer: expected[0] ?? '' }
   for (const exp of expected) {
@@ -97,6 +106,11 @@ export function checkAnswer(input: string, expected: string[]): AnswerCheck {
     }
   }
   if (best.dist === 0) return { verdict: 'correct', closest: best.answer }
+  if (wrong) {
+    let dWrong = Infinity
+    for (const w of variants(wrong)) for (const i of inputs) dWrong = Math.min(dWrong, levenshtein(i, w))
+    if (dWrong <= best.dist) return { verdict: 'wrong', closest: best.answer }
+  }
   // Une lettre de travers sur une réponse assez longue = faute de frappe tolérée,
   // sauf si elle change un mot grammatical (a/an, in/on, has/had…) : on ne tolère
   // que si le nombre de mots est identique et que la réponse fait plus de 8 lettres.
@@ -107,11 +121,21 @@ export function checkAnswer(input: string, expected: string[]): AnswerCheck {
   return { verdict: 'wrong', closest: best.answer }
 }
 
-const SHORT_GRAMMAR_WORDS = new Set([
-  'a', 'an', 'in', 'on', 'at', 'to', 'of', 'is', 'as', 'it', 'has', 'had', 'have', 'was', 'were',
-  'for', 'from', 'by', 'the', 'than', 'then', 'less', 'most', 'much', 'many', 'will', 'would',
-  'ago', 'since', 'this', 'that', 'these', 'those', 'did', 'does', 'do',
-])
+const SHORT_GRAMMAR_WORDS = new Set(
+  NL
+    ? [
+        'de', 'het', 'een', 'in', 'op', 'aan', 'te', 'is', 'en', 'of', 'ik', 'je', 'jij', 'u', 'we', 'wij', 'ze', 'zij', 'hij',
+        'mijn', 'jouw', 'zijn', 'haar', 'ons', 'uw', 'hun', 'met', 'voor', 'van', 'naar', 'uit', 'bij', 'om', 'dat', 'dit',
+        'die', 'deze', 'niet', 'geen', 'er', 'ook', 'nu', 'maar', 'dan', 'als', 'was', 'zijt', 'ben', 'heb', 'hebt', 'heeft',
+      ]
+    : [
+        'a', 'an', 'in', 'on', 'at', 'to', 'of', 'is', 'as', 'it', 'has', 'had', 'have', 'was', 'were',
+        'for', 'from', 'by', 'the', 'than', 'then', 'less', 'most', 'much', 'many', 'will', 'would',
+        'ago', 'since', 'this', 'that', 'these', 'those', 'did', 'does', 'do',
+      ],
+)
+// Fin de mot qui marque une conjugaison / un pluriel : -ed, -s (anglais) ; -en, -t (néerlandais).
+const ENDING = NL ? /(en|t)$/ : /(ed|s)$/
 
 // Vrai si la différence d'une lettre porte sur un petit mot grammatical (ex. "an" vs "on").
 function isGrammarSlip(input: string, expected: string): boolean {
@@ -120,7 +144,7 @@ function isGrammarSlip(input: string, expected: string): boolean {
   if (a.length !== b.length) return true
   for (let i = 0; i < a.length; i++) {
     if (a[i] !== b[i] && (SHORT_GRAMMAR_WORDS.has(a[i]) || SHORT_GRAMMAR_WORDS.has(b[i]))) return true
-    if (a[i] !== b[i] && /(ed|s)$/.test(b[i]) !== /(ed|s)$/.test(a[i])) return true
+    if (a[i] !== b[i] && ENDING.test(b[i]) !== ENDING.test(a[i])) return true
   }
   return false
 }
@@ -241,7 +265,9 @@ export function scoreSpokenMatch(transcript: string, target: string): MatchLevel
 // Vocabulaire : réponse écrite, tolérante sur l'orthographe
 // ---------------------------------------------------------------------------
 
-const LEADING_WORDS = /^(?:le |la |les |l'|un |une |des |du |de la |de l'|d'|se |s'|to |a |an |the )/
+const LEADING_WORDS = NL
+  ? /^(?:le |la |les |l'|un |une |des |du |de la |de l'|d'|se |s'|de |het |een |t )/
+  : /^(?:le |la |les |l'|un |une |des |du |de la |de l'|d'|se |s'|to |a |an |the )/
 
 function stripLeading(text: string): string {
   let t = text.trim()

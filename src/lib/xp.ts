@@ -3,6 +3,7 @@
 // changer ces barèmes ne fait perdre aucun point déjà gagné.
 import type { Exercise } from '../types'
 import type { ProgressData } from './store'
+import { EDITION } from '../edition'
 
 export type AnswerQuality = 'perfect' | 'typo' | 'override' | 'wrong'
 
@@ -13,7 +14,7 @@ export function answerXp(ex: Exercise, quality: AnswerQuality, combo = 0): numbe
   if (quality === 'wrong') return 2 // l'effort compte un peu
   let base: number = LEVEL_XP[ex.level ?? 'B2']
   if (ex.kind === 'card') base = Math.round(base * 0.6)
-  if (ex.kind === 'fix' || ex.kind === 'transform') base += 3 // réécrire une phrase entière
+  if (ex.kind === 'fix' || ex.kind === 'transform' || ex.kind === 'cloze') base += 3 // réécrire une phrase entière
   const factor = quality === 'perfect' ? 1 : quality === 'typo' ? 0.7 : 0.5
   return Math.round(base * factor) + comboBonus(combo)
 }
@@ -88,9 +89,28 @@ export const RANKS: Rank[] = [
   { from: 40, title: 'Royal Highness of English', fr: 'Altesse royale de l\'anglais', icon: '👑' },
 ]
 
+// Grades de l'accès Nunu (néerlandais) : de la Belgique aux Pays-Bas, en passant par les frites.
+export const RANKS_NL: Rank[] = [
+  { from: 1, title: 'Verdwaalde toerist', fr: 'Touriste égaré', icon: '🧳' },
+  { from: 3, title: 'Frietjes-leerling', fr: 'Apprenti du cornet de frites', icon: '🍟' },
+  { from: 6, title: 'Fietser', fr: 'Cycliste du dimanche', icon: '🚲' },
+  { from: 9, title: 'Tulpenplukker', fr: 'Cueilleur de tulipes', icon: '🌷' },
+  { from: 12, title: 'Molenaar', fr: 'Meunier du moulin', icon: '🌬️' },
+  { from: 15, title: 'Kaasboer', fr: 'Fromager d\'Alkmaar', icon: '🧀' },
+  { from: 18, title: 'Gids in Brugge', fr: 'Guide à Bruges', icon: '🏰' },
+  { from: 22, title: 'Nieuwslezer', fr: 'Présentateur du journal télévisé', icon: '📻' },
+  { from: 26, title: 'Taalprofessor', fr: 'Professeur de langue', icon: '🎓' },
+  { from: 30, title: 'Dichter', fr: 'Poète', icon: '🖋️' },
+  { from: 35, title: 'Ridder', fr: 'Chevalier du royaume', icon: '⚔️' },
+  { from: 40, title: 'Koning van het Nederlands', fr: 'Roi (ou reine) du néerlandais', icon: '👑' },
+]
+
+/** Liste des grades de l'accès en cours. */
+export const RANK_LIST: Rank[] = EDITION.lang === 'nl' ? RANKS_NL : RANKS
+
 export function rankOf(level: number): Rank {
-  let r = RANKS[0]
-  for (const rank of RANKS) if (level >= rank.from) r = rank
+  let r = RANK_LIST[0]
+  for (const rank of RANK_LIST) if (level >= rank.from) r = rank
   return r
 }
 

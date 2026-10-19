@@ -15,7 +15,7 @@ export function XpBar({ xp }: { xp: number }) {
       <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/25">
         <div className="h-full rounded-full bg-linear-to-r from-amber-300 to-yellow-200" style={{ width: `${(info.into / info.needed) * 100}%` }} />
       </div>
-      <p className="mt-1 text-[11px] text-white/80">
+      <p className="mt-1 text-[0.6875rem] text-white/80">
         Encore {info.needed - info.into} XP pour le niveau {info.level + 1}
       </p>
     </Link>
