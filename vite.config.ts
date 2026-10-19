@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   build: { chunkSizeWarningLimit: 1200 },
-  base: process.env.GITHUB_PAGES ? '/English-application/' : '/',
+  base: process.env.GITHUB_PAGES ? '/tea-time/' : '/',
   plugins: [
     react(),
     tailwindcss(),
