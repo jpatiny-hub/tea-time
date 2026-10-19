@@ -30,7 +30,10 @@ import { ThemeDetail, Themes } from './pages/Themes'
 import { EditionPicker } from './pages/EditionPicker'
 import { Translation } from './pages/Translation'
 import { TypedExercises } from './pages/TypedExercises'
-import { CHOSEN_EDITION } from './edition'
+import { CHOSEN_EDITION, isGuided } from './edition'
+import { Path } from './pages/Path'
+import { PathUnitPage } from './pages/PathUnit'
+import { PathStepPage } from './pages/PathStep'
 import { useProgress } from './lib/store'
 import { syncReminderState } from './lib/reminder'
 import { applyAppearance } from './lib/appearance'
@@ -131,6 +134,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cours" element={<Courses />} />
+          {isGuided && <Route path="/parcours" element={<Path />} />}
+          {isGuided && <Route path="/parcours/:unitId" element={<PathUnitPage />} />}
+          {isGuided && <Route path="/parcours/:unitId/:stepKey" element={<PathStepPage />} />}
           <Route path="/cours/module/:moduleId" element={<ModuleDetail />} />
           <Route path="/cours/seance/:sessionId" element={<SessionDetail />} />
           <Route path="/temps" element={<TenseLab />} />

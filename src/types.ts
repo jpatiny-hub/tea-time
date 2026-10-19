@@ -18,6 +18,10 @@ interface ExerciseBase {
   tags?: string[]
   /** Explication affichée après la réponse (en français). */
   explanation?: string
+  /** Texte lu à voix haute dès que l'exercice apparaît (exercices d'écoute). */
+  audio?: string
+  /** Exercice d'écoute : seule la consigne est affichée, la phrase à écrire est dans l'audio. */
+  listen?: boolean
 }
 
 /** Question à choix multiples. */

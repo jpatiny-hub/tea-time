@@ -23,6 +23,9 @@ interface Props {
   onFinish?: (correct: number, total: number) => void
   /** false pour ne pas toucher à la répétition espacée (ex. simple consultation). */
   record?: boolean
+  /** Parcours guidé : bouton principal de l'écran de fin (ex. « Étape suivante »). */
+  onNext?: () => void
+  nextLabel?: string
 }
 
 type Phase = 'answer' | 'feedback'
@@ -36,7 +39,7 @@ const kindLabel: Record<Exercise['kind'], string> = {
   cloze: 'Texte à trous',
 }
 
-export function ExerciseRunner({ items, title, onExit, onFinish, record = true }: Props) {
+export function ExerciseRunner({ items, title, onExit, onFinish, record = true, onNext, nextLabel }: Props) {
   const [queue, setQueue] = useState(items)
   const [index, setIndex] = useState(0)
   const [phase, setPhase] = useState<Phase>('answer')
@@ -74,7 +77,9 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
     setVerdict(null)
     setClosest('')
     setOverride(false)
-    const t = setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 50)
+    // Exercice d'écoute : la phrase est lue dès l'affichage.
+    if (ex.audio && canSpeak()) speak(ex.audio)
+    const t = setTimeout(() => (ex.audio ? undefined : inputRef.current?.focus({ preventScroll: true })), 50)
     return () => clearTimeout(t)
   }, [ex, round, index])
 
@@ -207,6 +212,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
           </div>
         )}
 
+        {onNext && <button onClick={onNext} className={`${btnPrimary} mt-4`}>{nextLabel ?? 'Continuer →'}</button>}
         <button onClick={onExit} className={`${btnSecondary} mt-3`}>Terminer</button>
       </div>
     )
@@ -246,6 +252,12 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true }
           />
         ) : (
           <>
+            {ex.audio && (
+              <div className="mt-3 flex items-center gap-3 rounded-2xl bg-indigo-50 p-3 dark:bg-indigo-500/10">
+                <SpeakButton text={ex.audio} label="Réécouter" />
+                <span className="text-xs text-gray-500 dark:text-gray-400">Écoute bien, tu peux réécouter autant que tu veux.</span>
+              </div>
+            )}
             <Prompt ex={ex} />
 
             {ex.kind === 'mcq' && (
@@ -385,7 +397,7 @@ function Prompt({ ex }: { ex: Exercise }) {
       return (
         <div className="mt-3">
           <p className="text-sm text-gray-500 dark:text-gray-400">{ex.instruction}</p>
-          <p className="mt-1 text-lg font-medium">{ex.prompt}</p>
+          {!ex.listen && <p className="mt-1 text-lg font-medium">{ex.prompt}</p>}
         </div>
       )
     default:

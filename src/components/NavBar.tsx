@@ -1,9 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
-import { isDutch } from '../edition'
+import { isDutch, isGuided } from '../edition'
 
 const items = [
   { to: '/', label: 'Accueil', icon: '🏠' },
-  { to: '/cours', label: 'Cours', icon: '🎓' },
+  isGuided ? { to: '/parcours', label: 'Parcours', icon: '🧭' } : { to: '/cours', label: 'Cours', icon: '🎓' },
   { to: '/temps', label: isDutch ? 'Verbes' : 'Temps', icon: '⏳' },
   { to: '/vocabulaire', label: 'Vocab', icon: '🗂️' },
   { to: '/pratique', label: 'Pratique', icon: '✍️' },

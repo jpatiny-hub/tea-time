@@ -149,6 +149,8 @@ export const EDITION: Edition = EDITIONS[CHOSEN_EDITION ?? 'jojo']
 export const isJuju = EDITION.id === 'jujularage'
 /** Vrai pour tous les accès sauf Jojo : contenu de niveau débutant (A1 → A2), sans séances de cours. */
 export const isBasic = EDITION.id !== 'jojo'
+/** Accès avec un parcours guidé de leçons (Maman et Nunu). */
+export const isGuided = EDITION.id === 'maman' || EDITION.id === 'nunu'
 export const isDutch = EDITION.lang === 'nl'
 
 export function chooseEdition(id: EditionId) {

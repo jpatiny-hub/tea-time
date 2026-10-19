@@ -55,7 +55,7 @@ export function Speaking() {
 
 // ---------------------------------------------------------------------------
 
-function useRecognizer(target: string) {
+export function useRecognizer(target: string) {
   const [listening, setListening] = useState(false)
   const [result, setResult] = useState<MatchLevel | 'error' | null>(null)
   const [heard, setHeard] = useState('')
@@ -86,7 +86,7 @@ function useRecognizer(target: string) {
   return { listening, result, heard, start }
 }
 
-function MicResult({ result, heard }: { result: MatchLevel | 'error' | null; heard: string }) {
+export function MicResult({ result, heard }: { result: MatchLevel | 'error' | null; heard: string }) {
   if (!result) return null
   if (result === 'error') return <p className="mt-3 text-sm text-red-600">Je n'ai rien entendu, ou le micro n'est pas autorisé.</p>
   return (

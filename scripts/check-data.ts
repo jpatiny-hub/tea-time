@@ -15,6 +15,8 @@ import { themes } from '../src/data/themes.ts'
 import { EDITION } from '../src/edition.ts'
 import { checkAnswer, checkVocab, normalizeForComparison, vocabCandidates } from '../src/lib/text.ts'
 import type { Exercise } from '../src/types.ts'
+import { isGuided } from '../src/edition.ts'
+import { grammarStepExercises, pathUnits, phraseStepExercises, practiceStepExercises, recapExercises, wordStepExercises } from '../src/lib/path.ts'
 
 const errors: string[] = []
 const seen = new Map<string, string>()
@@ -121,6 +123,39 @@ const count = (k: Exercise['kind']) => allExercises.filter((r) => r.exercise.kin
 console.log(`Contenu : ${sessions.length} séances, ${modules.length} modules, ${grammarLessons.length} leçons, ${allVocab.length} mots, ${allExercises.length} exercices`)
 console.log(`  (qcm ${count('mcq')}, trous ${count('gap')}, corrections ${count('fix')}, réécritures ${count('transform')})`)
 console.log(`  ${readingTexts.length} textes, ${dialogues.length} dialogues, ${writingTasks.length} sujets d'écrit`)
+
+// Parcours guidé (Maman, Nunu) : chaque étape doit produire des exercices valides, aux ids uniques.
+if (isGuided) {
+  let nSteps = 0
+  let nGenerated = 0
+  const stepKeys = new Set<string>()
+  for (const u of pathUnits) {
+    for (const st of u.steps) {
+      nSteps++
+      if (stepKeys.has(st.id)) errors.push(`parcours : étape en double « ${st.id} »`)
+      stepKeys.add(st.id)
+      const where = `Parcours · ${st.id}`
+      let list: Exercise[] = []
+      if (st.kind === 'words') list = wordStepExercises(st, u)
+      else if (st.kind === 'phrases') list = phraseStepExercises(u)
+      else if (st.kind === 'practice') list = practiceStepExercises(u, st.part ?? 0)
+      else if (st.kind === 'recap') list = recapExercises(u)
+      else if (st.kind === 'grammar') list = grammarStepExercises(grammarLessons.find((l) => l.id === st.lessonId)!)
+      if (st.kind === 'words' && list.length < 12) errors.push(`${where} : seulement ${list.length} exercices`)
+      if (st.kind === 'practice' && list.length === 0) errors.push(`${where} : aucun exercice`)
+      const ids = new Set<string>()
+      for (const ex of list) {
+        if (ids.has(ex.id)) errors.push(`${where} : exercice en double « ${ex.id} »`)
+        ids.add(ex.id)
+        if (ex.id.includes('~')) {
+          nGenerated++
+          checkExercise(ex, where)
+        }
+      }
+    }
+  }
+  console.log(`  Parcours : ${pathUnits.length} leçons, ${nSteps} étapes, ${nGenerated} exercices fabriqués vérifiés`)
+}
 
 if (errors.length > 0) {
   console.error(`\n❌ ${errors.length} problème(s) :`)

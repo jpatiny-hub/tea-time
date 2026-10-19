@@ -143,4 +143,16 @@ export const mamanChangelog: ChangelogEntry[] = [
       'Interface claire, et la taille du texte se règle dans Progrès → Réglages.',
     ],
   },
+  {
+    version: 2,
+    date: '2026-10-20',
+    title: 'Un parcours guidé, leçon après leçon 🧭',
+    changes: [
+      'Nouvel onglet « Parcours » : chaque thème devient une leçon découpée en petites étapes qui se débloquent au fur et à mesure.',
+      'Chaque mot est d’abord découvert dans une phrase (avec l’audio, et la possibilité de le répéter à voix haute), puis revu dans d’autres contextes.',
+      'Les exercices montent en difficulté : choisir parmi des propositions, écouter, compléter, puis taper soi-même la réponse.',
+      'La grammaire se découvre pas à pas : d’abord des exemples à observer, ensuite l’explication, puis les exercices.',
+      'Un rappel remélange les mots des leçons précédentes. Pour sauter des étapes : Parcours → « Tout débloquer ».',
+    ],
+  },
 ]

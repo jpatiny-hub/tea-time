@@ -57,6 +57,8 @@ export interface Settings {
   reminderHour: number
   /** Encart « Active ton rappel » masqué sur l'accueil. */
   reminderPromptDismissed: boolean
+  /** Parcours guidé : toutes les leçons et étapes sont accessibles sans suivre l'ordre. */
+  pathFree: boolean
 }
 
 export interface ProgressData {
@@ -95,6 +97,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reminderEnabled: false,
   reminderHour: 19,
   reminderPromptDismissed: false,
+  pathFree: false,
 }
 
 function emptyData(): ProgressData {
