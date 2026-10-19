@@ -14,9 +14,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        // Identifiant explicite de l'appli installée. Le changer = Chrome la voit comme une NOUVELLE appli
-        // (utile si Android croit encore une ancienne installation présente : « appli déjà installée »).
-        id: 'english-tea-time',
+        // Identifiant explicite de l'appli installée. ⚠️ Chrome le résout par rapport au SITE (pas au dossier) :
+        // deux adresses du même site avec le même id = « appli déjà installée ». Le changer = Chrome la voit
+        // comme une NOUVELLE appli (utile si Android croit encore une ancienne installation présente).
+        // Historique : (aucun) → 'english-tea-time' (adresse /English-application/) → 'english-tea-time-2' (/tea-time/).
+        id: 'english-tea-time-2',
         name: 'English — Tea Time',
         short_name: 'English',
         description: "Application pour progresser en anglais : accès Jojo (B2 → C1) et Jujularage (A1 → A2)",

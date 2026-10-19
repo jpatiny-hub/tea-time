@@ -42,6 +42,7 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - Thèmes & culture (Halloween…) : `src/data/themes.ts` (type `ThemeLesson`), ids d'exercices `th-<thème>-NN`, paquets de vocabulaire dans `discoveryDecks` (`vocabulary.ts`), `season` (MM-JJ) pour la mise en avant sur l'accueil.
 - Interface : une teinte par rubrique (`tones` / `useTone` dans `src/components/ui.tsx`, déduite de l'adresse) ; utiliser `card`, `hero`, `btnPrimary`, `IconTile`, `ListLink` plutôt que des classes ad hoc. Police Nunito embarquée (`@fontsource-variable/nunito`, précachée pour le hors-ligne).
 - Gamification : `src/lib/xp.ts` (barème, niveaux, grades). L'XP est stockée (`xp`, `xpByDay`, schéma 2) et n'est jamais recalculée : changer le barème ne retire rien. `recordAnswer(ex, ok, xp)` et `recordActivity(n, xp)` l'alimentent.
+- PWA : `id` du manifest (vite.config.ts) = identité de l'appli installée pour Chrome, résolue par rapport au site entier. Ne pas le changer sans raison ; le changer force une nouvelle installation.
 - Logo : `public/favicon.svg` (source) ; les PNG de `public/icons/` en sont des rendus (changer leur nom à chaque nouveau logo pour forcer la mise à jour sur les téléphones) (192, 512, maskable 512 sans coins arrondis, apple-touch 180).
 - Séries « Changer de perspective » (`pe-*`) et « Synonymes » (`sy-*`) dans `src/data/style.ts`.
 - Garder la progression B2 → B2+ → C1 : chaque nouvel ensemble d'exercices devrait contenir un peu de C1.
