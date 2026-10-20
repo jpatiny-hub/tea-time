@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { grammarLessons } from '../data/grammar'
-import { allDecks } from '../data/vocabulary'
 import { useProgress, updateProgress } from '../lib/store'
 import { canListen } from '../lib/speech'
 import {
-  findInSentence, followingStep, grammarStepExercises, isStepDone, isStepUnlocked, phraseStepExercises, practiceStepExercises,
-  recapExercises, stepOf, unitOf, wordStepExercises, type PathStep, type PathUnit,
+  correctionStepExercises, findInSentence, followingStep, grammarStepExercises, isStepDone, isStepUnlocked, phraseStepExercises, practiceStepExercises,
+  recapExercises, stepOf, unitOf, unitWords, wordStepExercises, type PathStep, type PathUnit,
 } from '../lib/path'
 import type { Exercise, GrammarLesson, VocabItem } from '../types'
 import { ExerciseRunner } from '../components/ExerciseRunner'
@@ -244,9 +243,9 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
 
   const lesson = step.lessonId ? grammarLessons.find((l) => l.id === step.lessonId) : undefined
   const words = useMemo(() => {
-    const all = (mod.deckIds ?? []).flatMap((id) => allDecks.find((d) => d.id === id)?.items ?? [])
+    const all = unitWords(unit)
     return (step.wordIds ?? []).map((id) => all.find((w) => w.id === id)).filter((w): w is VocabItem => !!w)
-  }, [mod, step])
+  }, [unit, step])
 
   // Les exercices sont fabriqués une seule fois par passage (le tirage des mauvaises réponses est aléatoire).
   const exercises: Exercise[] = useMemo(() => {
@@ -254,6 +253,7 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
       case 'words': return wordStepExercises(step, unit)
       case 'phrases': return phraseStepExercises(unit)
       case 'grammar': return lesson ? grammarStepExercises(lesson) : []
+      case 'corrections': return correctionStepExercises(unit, step.part ?? 0)
       case 'practice': return practiceStepExercises(unit, step.part ?? 0)
       case 'recap': return recapExercises(unit)
       default: return []
@@ -268,7 +268,8 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
     if (legacyDone && !isStepDone(data, step)) markDone(step)
   }, [legacyDone, data, step])
 
-  const goNext = () => navigate(next ? `/parcours/${next.unit.id}/${next.step.key}` : '/parcours')
+  const home = unit.track === 'lexie' ? '/lexie' : '/parcours'
+  const goNext = () => navigate(next ? `/parcours/${next.unit.id}/${next.step.key}` : home)
   const back = () => navigate(`/parcours/${unit.id}`)
   const nextLabel = next ? (next.unit.id !== unit.id ? 'Leçon suivante →' : 'Étape suivante →') : 'Retour au parcours'
 
@@ -280,7 +281,7 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
       : `/pratique/ecrit/${mod.writingTaskIds[0]}`
     const done = isStepDone(data, step)
     return (
-      <Page title={`${step.icon} ${step.title}`} subtitle={<>Leçon {unit.number} · {mod.titleFr}</>} back={{ to: `/parcours/${unit.id}`, label: 'Leçon' }}>
+      <Page title={`${step.icon} ${step.title}`} subtitle={<>{unit.track === 'lexie' ? 'Lexie' : 'Leçon'} {unit.number} · {mod.titleFr}</>} back={{ to: `/parcours/${unit.id}`, label: 'Leçon' }}>
         <div className={`${card} p-5`}>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             {step.kind === 'dialogue' && 'Écoute la conversation (tu peux la lire en même temps), puis réponds aux questions. Réécoute autant de fois que tu veux.'}
@@ -313,10 +314,13 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
   }
 
   return (
-    <Page title={`${step.icon} ${step.title}`} subtitle={<>Leçon {unit.number} · {mod.titleFr}</>} back={{ to: `/parcours/${unit.id}`, label: 'Leçon' }}>
+    <Page title={`${step.icon} ${step.title}`} subtitle={<>{unit.track === 'lexie' ? 'Lexie' : 'Leçon'} {unit.number} · {mod.titleFr}</>} back={{ to: `/parcours/${unit.id}`, label: 'Leçon' }}>
       {step.kind === 'words' && <LearnWords unit={unit} items={words} onDone={() => setPhase('practice')} />}
       {step.kind === 'grammar' && lesson && <LearnGrammar lesson={lesson} onDone={() => setPhase('practice')} />}
       {step.kind === 'phrases' && <LearnPhrases unit={unit} onDone={() => setPhase('practice')} />}
+      {step.kind === 'corrections' && (
+        <Intro icon="🩹" title="Corrige les phrases" text="Ce sont des phrases corrigées pendant tes cours : repère l’erreur et réécris la phrase correctement." onStart={() => { setExercisesKey((k) => k + 1); setPhase('practice') }} />
+      )}
       {step.kind === 'practice' && (
         <Intro icon="🧩" title="Mets tout en pratique" text="Tu vas retrouver les mots et la grammaire de la leçon dans des phrases variées : d’abord on choisit, puis on écrit." onStart={() => { setExercisesKey((k) => k + 1); setPhase('practice') }} />
       )}

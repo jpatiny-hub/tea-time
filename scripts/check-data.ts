@@ -15,8 +15,7 @@ import { themes } from '../src/data/themes.ts'
 import { EDITION } from '../src/edition.ts'
 import { checkAnswer, checkVocab, normalizeForComparison, vocabCandidates } from '../src/lib/text.ts'
 import type { Exercise } from '../src/types.ts'
-import { isGuided } from '../src/edition.ts'
-import { grammarStepExercises, pathUnits, phraseStepExercises, practiceStepExercises, recapExercises, wordStepExercises } from '../src/lib/path.ts'
+import { correctionStepExercises, grammarStepExercises, pathUnits, phraseStepExercises, practiceStepExercises, recapExercises, wordStepExercises } from '../src/lib/path.ts'
 
 const errors: string[] = []
 const seen = new Map<string, string>()
@@ -125,7 +124,7 @@ console.log(`  (qcm ${count('mcq')}, trous ${count('gap')}, corrections ${count(
 console.log(`  ${readingTexts.length} textes, ${dialogues.length} dialogues, ${writingTasks.length} sujets d'écrit`)
 
 // Parcours guidé (Maman, Nunu) : chaque étape doit produire des exercices valides, aux ids uniques.
-if (isGuided) {
+{
   let nSteps = 0
   let nGenerated = 0
   const stepKeys = new Set<string>()
@@ -137,12 +136,13 @@ if (isGuided) {
       const where = `Parcours · ${st.id}`
       let list: Exercise[] = []
       if (st.kind === 'words') list = wordStepExercises(st, u)
+      else if (st.kind === 'corrections') list = correctionStepExercises(u, st.part ?? 0)
       else if (st.kind === 'phrases') list = phraseStepExercises(u)
       else if (st.kind === 'practice') list = practiceStepExercises(u, st.part ?? 0)
       else if (st.kind === 'recap') list = recapExercises(u)
       else if (st.kind === 'grammar') list = grammarStepExercises(grammarLessons.find((l) => l.id === st.lessonId)!)
-      if (st.kind === 'words' && list.length < 12) errors.push(`${where} : seulement ${list.length} exercices`)
-      if (st.kind === 'practice' && list.length === 0) errors.push(`${where} : aucun exercice`)
+      if (st.kind === 'words' && list.length < 8) errors.push(`${where} : seulement ${list.length} exercices`)
+      if ((st.kind === 'practice' || st.kind === 'corrections') && list.length === 0) errors.push(`${where} : aucun exercice`)
       const ids = new Set<string>()
       for (const ex of list) {
         if (ids.has(ex.id)) errors.push(`${where} : exercice en double « ${ex.id} »`)

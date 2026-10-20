@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useProgress } from '../lib/store'
 import { isStepDone, isStepUnlocked, isUnitUnlocked, unitDoneCount, unitOf } from '../lib/path'
+import { UnitOverviewList } from './Path'
 import { card, Page, ProgressBar } from '../components/ui'
 
 export function PathUnitPage() {
@@ -9,12 +10,13 @@ export function PathUnitPage() {
   const unit = unitOf(unitId)
   if (!unit) return <Page title="Leçon introuvable" back={{ to: '/parcours', label: 'Parcours' }}>{null}</Page>
   const m = unit.module
+  const home = unit.track === 'lexie' ? { to: '/lexie', label: 'Lexie' } : { to: '/parcours', label: 'Parcours' }
   const { done, total } = unitDoneCount(data, unit)
   const unlocked = isUnitUnlocked(data, unit)
   const current = unit.steps.find((s) => !s.optional && !isStepDone(data, s))
 
   return (
-    <Page title={`${m.icon} ${m.title}`} subtitle={<>Leçon {unit.number} · {m.titleFr}</>} back={{ to: '/parcours', label: 'Parcours' }}>
+    <Page title={`${m.icon} ${m.title}`} subtitle={<>{unit.track === 'lexie' ? 'Lexie' : 'Leçon'} {unit.number} · {m.titleFr}</>} back={home}>
       <div className={`${card} text-sm`}>
         <p className="text-gray-600 dark:text-gray-300">{m.description}</p>
         <div className="mt-2 flex items-center gap-3">
@@ -22,6 +24,8 @@ export function PathUnitPage() {
           <span className="text-xs font-bold text-gray-500">{done}/{total}</span>
         </div>
       </div>
+
+      <div className="mt-3"><UnitOverviewList unit={unit} /></div>
 
       {!unlocked && <p className="mt-3 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-500/10 dark:text-amber-200">🔒 Termine d'abord la leçon précédente pour débloquer celle-ci.</p>}
 

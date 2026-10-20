@@ -32,6 +32,7 @@ import { Translation } from './pages/Translation'
 import { TypedExercises } from './pages/TypedExercises'
 import { CHOSEN_EDITION, isGuided } from './edition'
 import { Path } from './pages/Path'
+import { hasLexie } from './lib/path'
 import { PathUnitPage } from './pages/PathUnit'
 import { PathStepPage } from './pages/PathStep'
 import { useProgress } from './lib/store'
@@ -135,6 +136,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cours" element={<Courses />} />
           {isGuided && <Route path="/parcours" element={<Path />} />}
+          {isGuided && hasLexie && <Route path="/lexie" element={<Path track="lexie" />} />}
           {isGuided && <Route path="/parcours/:unitId" element={<PathUnitPage />} />}
           {isGuided && <Route path="/parcours/:unitId/:stepKey" element={<PathStepPage />} />}
           <Route path="/cours/module/:moduleId" element={<ModuleDetail />} />

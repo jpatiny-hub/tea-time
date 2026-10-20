@@ -12,6 +12,7 @@ import { seasonalTheme, themes } from '../data/themes'
 import { XpBar } from '../components/XpBar'
 import { EDITION, isDutch, isGuided, isJuju } from '../edition'
 import { ContinueCard } from './Path'
+import { hasLexie } from '../lib/path'
 import { extra } from '../data/edition-content'
 import { formatDateFr } from '../lib/text'
 import { grammarLessons } from '../data/grammar'
@@ -102,6 +103,16 @@ export function Home() {
       </div>
 
       {isGuided && <div className="mt-3"><ContinueCard /></div>}
+      {hasLexie && (
+        <Link to="/lexie" className={`${cardLink} mt-3 flex items-center gap-3`}>
+          <IconTile icon="👶" tone="rose" />
+          <div className="flex-1">
+            <p className="font-bold">Parcours Lexie</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Parler anglais avec bébé, à part de tes cours</p>
+          </div>
+          <span className="text-2xl font-bold leading-none text-rose-600">›</span>
+        </Link>
+      )}
 
       {data.seenContentVersion < CONTENT_VERSION && (
         <Link to="/nouveautes" className="mt-3 flex items-center gap-3 rounded-3xl bg-amber-50 p-4 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:ring-amber-500/30">

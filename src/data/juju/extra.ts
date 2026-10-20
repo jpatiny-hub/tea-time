@@ -57,6 +57,19 @@ export const jujuPronunciation: PronunciationItem[] = [
 
 export const jujuChangelog: ChangelogEntry[] = [
   {
+    version: 4,
+    date: '2026-10-20',
+    title: 'Un parcours guidé 🧭',
+    changes: [
+      'Nouvel onglet « Parcours » : chaque module devient une leçon découpée en petites étapes qui se débloquent au fur et à mesure.',
+      'Chaque leçon affiche « Au programme » : les mots, les points de grammaire, le dialogue et le texte qui seront vus.',
+      'Les mots sont d’abord découverts dans une phrase (avec l’audio, et la possibilité de les répéter à voix haute), puis revus dans d’autres contextes.',
+      'Les exercices montent en difficulté : choisir, écouter, compléter, puis taper soi-même. La grammaire commence par des exemples à observer.',
+      'Lexie 👶 a son propre parcours (onglet Parcours ou accueil), indépendant de tes leçons habituelles.',
+      'Pour sauter des étapes : Parcours → « Tout débloquer ». Les anciens cours et modules restent accessibles librement.',
+    ],
+  },
+  {
     version: 3,
     date: '2026-10-17',
     title: 'Nouveau parcours : Lexie 👶',
