@@ -329,7 +329,11 @@ export function recapExercises(unit: PathUnit): Exercise[] {
   const olderItems = prev.flatMap((u) => deckItems(u.module))
   const nowItems = deckItems(unit.module)
   const pool = [...olderItems, ...nowItems]
-  const chosen = [...pick(olderItems, 7), ...pick(nowItems, 3)]
+  const nowIds = new Set(nowItems.map((w) => w.id))
+  const older = olderItems.filter((w) => !nowIds.has(w.id))
+  // Un même mot ne doit apparaître qu'une fois dans le rappel.
+  const seen = new Set<string>()
+  const chosen = [...pick(older, 7), ...pick(nowItems, 3)].filter((w) => (seen.has(w.id) ? false : (seen.add(w.id), true)))
   const out: Exercise[] = []
   chosen.forEach((it, i) => {
     out.push(i % 2 === 0 ? meaningMcq(it, pool, 'mr') : listenMcq(it, pool, 'lr'))
