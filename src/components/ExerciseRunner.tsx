@@ -29,6 +29,8 @@ interface Props {
   /** Parcours guidé : bouton principal de l'écran de fin (ex. « Étape suivante »). */
   onNext?: () => void
   nextLabel?: string
+  /** true : garder l'ordre donné (parcours guidé : du plus guidé au plus libre). Sinon l'ordre des questions est mélangé. */
+  ordered?: boolean
 }
 
 type Phase = 'answer' | 'feedback'
@@ -42,8 +44,9 @@ const kindLabel: Record<Exercise['kind'], string> = {
   cloze: 'Texte à trous',
 }
 
-export function ExerciseRunner({ items, title, onExit, onFinish, record = true, onNext, nextLabel }: Props) {
-  const [queue, setQueue] = useState(items)
+export function ExerciseRunner({ items, title, onExit, onFinish, record = true, onNext, nextLabel, ordered = false }: Props) {
+  // Les questions arrivent dans un ordre différent à chaque fois (les options des QCM sont aussi mélangées, plus bas).
+  const [queue, setQueue] = useState(() => (ordered ? items : shuffle(items)))
   const [index, setIndex] = useState(0)
   const [phase, setPhase] = useState<Phase>('answer')
   const [text, setText] = useState('')

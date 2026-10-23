@@ -59,6 +59,13 @@ export function sortByDifficulty(list: Exercise[]): Exercise[] {
   return list.map((ex, i) => ({ ex, i })).sort((a, b) => KIND_RANK[a.ex.kind] - KIND_RANK[b.ex.kind] || a.i - b.i).map((x) => x.ex)
 }
 
+/** Garde la progression (choisir → compléter → écrire) mais mélange l'ordre des questions à l'intérieur de chaque type. */
+export function shuffleWithinKinds(list: Exercise[]): Exercise[] {
+  const groups = new Map<number, Exercise[]>()
+  for (const ex of list) groups.set(KIND_RANK[ex.kind], [...(groups.get(KIND_RANK[ex.kind]) ?? []), ex])
+  return [...groups.entries()].sort((a, b) => a[0] - b[0]).flatMap(([, g]) => shuffle(g))
+}
+
 // ---------------------------------------------------------------- construction du parcours
 
 /** Mots d'un thème : paquets liés + vocabulaire des séances de cours (accès Jojo). */
@@ -284,13 +291,13 @@ export function wordStepExercises(step: PathStep, unit: PathUnit): Exercise[] {
   const items = (step.wordIds ?? []).map((id) => all.find((w) => w.id === id)).filter((w): w is VocabItem => !!w)
   const pool = all.length >= 5 ? all : [...all, ...allDecks.flatMap((d) => d.items).slice(0, 20)]
   const out: Exercise[] = []
-  for (const it of items) out.push(meaningMcq(it, pool))
+  for (const it of shuffle(items)) out.push(meaningMcq(it, pool))
   for (const it of pick(items, 2)) out.push(listenMcq(it, pool))
-  const inContext = items.map((it) => contextMcq(it, pool)).filter((x): x is McqExercise => !!x)
+  const inContext = shuffle(items).map((it) => contextMcq(it, pool)).filter((x): x is McqExercise => !!x)
   out.push(...inContext.slice(0, 4))
-  for (const it of items) out.push(vocabCard(it, 'fr-en'))
+  for (const it of shuffle(items)) out.push(vocabCard(it, 'fr-en'))
   const usedCtx = new Set(inContext.slice(0, 4).map((c) => c.id.split('~')[0]))
-  const gaps = items.filter((it) => !usedCtx.has(it.id)).map((it) => contextGap(it)).filter((x): x is GapExercise => !!x)
+  const gaps = shuffle(items).filter((it) => !usedCtx.has(it.id)).map((it) => contextGap(it)).filter((x): x is GapExercise => !!x)
   const gapPool = gaps.length >= 2 ? gaps : items.map((it) => contextGap(it)).filter((x): x is GapExercise => !!x)
   out.push(...gapPool.slice(0, 3))
   const sentences = items.filter((it) => it.example && wordCount(it.example) <= 8 && !it.example.includes('—'))
@@ -310,7 +317,7 @@ export function phraseStepExercises(unit: PathUnit): Exercise[] {
 /** Étape de grammaire : exercices de la fiche, des choix vers l'écriture. */
 export function grammarStepExercises(lesson: GrammarLesson): Exercise[] {
   const tagged = lesson.exercises.map((ex) => ({ ...ex, tags: Array.from(new Set([...(ex.tags ?? []), lesson.tag])) }) as Exercise)
-  return sortByDifficulty(tagged)
+  return shuffleWithinKinds(tagged)
 }
 
 /** Étape « mes corrections » : les phrases corrigées en cours (accès Jojo). */
@@ -320,7 +327,8 @@ export function correctionStepExercises(unit: PathUnit, part: number): Exercise[
 
 /** Étape de mise en pratique : les exercices mêlés du thème, des choix vers l'écriture. */
 export function practiceStepExercises(unit: PathUnit, part: number): Exercise[] {
-  return sortByDifficulty(unit.module.exercises).slice(part * PRACTICE_CHUNK, (part + 1) * PRACTICE_CHUNK)
+  // Les parties sont découpées dans l'ordre stable (chaque exercice reste dans « sa » partie), puis mélangées à l'intérieur.
+  return shuffleWithinKinds(sortByDifficulty(unit.module.exercises).slice(part * PRACTICE_CHUNK, (part + 1) * PRACTICE_CHUNK))
 }
 
 /** Rappel : des mots des deux leçons précédentes (et un peu de celle-ci) dans des contextes nouveaux. */

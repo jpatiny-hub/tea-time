@@ -304,6 +304,7 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
       <ExerciseRunner
         key={exercisesKey}
         items={exercises}
+        ordered={step.kind === 'words' || step.kind === 'grammar' || step.kind === 'practice' || step.kind === 'recap'}
         title={`${step.title} · ${mod.title}`}
         onExit={back}
         onFinish={() => markDone(step)}
