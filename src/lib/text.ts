@@ -59,11 +59,53 @@ export function normalizeForComparison(text: string): string {
   return t
 }
 
-// "'d" peut valoir "would" ou "had" : on génère les deux lectures.
+// Certaines contractions ont deux lectures : "'d" = would / had, "'s" = is / has (ou possessif : on garde aussi la forme telle quelle).
+// On génère toutes les lectures, et deux réponses sont équivalentes dès qu'elles en partagent une
+// (it's = it is = it has, I'd = I would = I had).
 function variants(text: string): string[] {
-  const n = normalizeForComparison(text)
-  if (NL || !n.includes("'d")) return [n]
-  return [n.replace(/'d\b/g, ' would'), n.replace(/'d\b/g, ' had')].map((v) => v.replace(/\s+/g, ' '))
+  return readings(normalizeForComparison(text))
+}
+
+/** Toutes les lectures d'un texte déjà normalisé. */
+function readings(n: string): string[] {
+  if (NL) return [n]
+  let out = [n]
+  if (n.includes("'s")) out = out.flatMap((v) => [v, v.replace(/'s\b/g, ' is'), v.replace(/'s\b/g, ' has')])
+  if (n.includes("'d")) out = out.flatMap((v) => [v.replace(/'d\b/g, ' would'), v.replace(/'d\b/g, ' had')])
+  return Array.from(new Set(out.map((v) => v.replace(/\s+/g, ' '))))
+}
+
+/** Clé de comparaison « contractions seulement » (ponctuation conservée) : sert à repérer deux options qui ne diffèrent que par une contraction. */
+export function contractionKey(text: string): string {
+  const t = text.toLowerCase().replace(/[’‘`´]/g, "'")
+  return CONTRACTIONS.reduce((acc, [re, rep]) => acc.replace(re, rep), t).replace(/'s\b/g, ' is').replace(/'d\b/g, ' would').replace(/\s+/g, ' ').trim()
+}
+
+/** Deux réponses équivalentes (contractions, casse, ponctuation, UK / US) ? */
+export function sameAnswer(a: string, b: string): boolean {
+  return checkAnswer(a, [b]).verdict === 'correct'
+}
+
+/**
+ * Phrase à trou : on accepte aussi la réponse tapée avec le mot qui précède ou suit le trou
+ * (ex. « I ___ happy » : « I'm » est reconnu comme « am »).
+ */
+export function checkGap(input: string, answers: string[], prompt: string): AnswerCheck {
+  const direct = checkAnswer(input, answers)
+  if (direct.verdict !== 'wrong') return direct
+  const [before = '', after = ''] = prompt.split('___')
+  const prev = normalizeForComparison(before).split(' ').filter(Boolean).pop()
+  const next = normalizeForComparison(after).split(' ').filter(Boolean)[0]
+  for (const v of variants(input)) {
+    let t = v
+    if (prev && t.startsWith(`${prev} `)) t = t.slice(prev.length + 1)
+    if (next && t.endsWith(` ${next}`)) t = t.slice(0, -(next.length + 1))
+    if (t !== v) {
+      const res = checkAnswer(t, answers)
+      if (res.verdict !== 'wrong') return res
+    }
+  }
+  return direct
 }
 
 function levenshtein(a: string, b: string): number {
@@ -304,9 +346,14 @@ export function checkVocab(input: string, back: string): AnswerCheck {
   const candidates = vocabCandidates(back)
   if (!given) return { verdict: 'wrong', closest: candidates[1] ?? candidates[0] ?? back }
   let best = { dist: Infinity, cand: candidates[0] ?? '' }
+  const givens = readings(given)
   for (const c of candidates) {
-    const d = levenshtein(given, c)
-    if (d < best.dist) best = { dist: d, cand: c }
+    for (const r of readings(c)) {
+      for (const g of givens) {
+        const d = levenshtein(g, r)
+        if (d < best.dist) best = { dist: d, cand: c }
+      }
+    }
   }
   if (best.dist === 0) return { verdict: 'correct', closest: best.cand }
   if (best.dist <= vocabTolerance(best.cand.length)) return { verdict: 'typo', closest: best.cand }

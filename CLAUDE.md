@@ -60,3 +60,9 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - Pas de `backdrop-blur` ni d'animation `active:scale` : suspects d'écrans vides sous Chrome (vidéo du 09.10, téléphone Samsung, mode sombre).
 - `src/lib/diagnostics.ts` : garde-fous `removeChild` / `insertBefore` et journal d'erreurs (`english-app:errors`) affiché dans « Progrès → Diagnostic technique ». Si l'utilisateur signale un bug d'affichage, lui demander de copier ce journal.
 - `ErrorBoundary` autour des routes (`src/App.tsx`).
+
+## Contractions anglaises (règle à ne pas casser)
+- La comparaison des réponses (`lib/text.ts`) traite « I'm = I am », « it's = it is = it has », « I'd = I would = I had », « don't = do not »… dans les DEUX sens, pour les exercices à taper, les cartes de vocabulaire et les phrases à trou (`checkGap` accepte aussi « I'm » pour « I ___ happy »).
+- Ne jamais lister « à la main » les deux formes pour contourner le problème, et ne jamais proposer deux options de QCM qui ne diffèrent que par une contraction.
+- `npm run check-data` vérifie tout cela (variantes avec / sans contraction de chaque réponse, options de QCM équivalentes) : une erreur bloque la publication.
+

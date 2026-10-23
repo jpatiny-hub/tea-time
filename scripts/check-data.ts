@@ -13,7 +13,7 @@ import { extraPronunciation } from '../src/data/pronunciation.ts'
 import { changelog } from '../src/data/changelog.ts'
 import { themes } from '../src/data/themes.ts'
 import { EDITION } from '../src/edition.ts'
-import { checkAnswer, checkVocab, normalizeForComparison, vocabCandidates } from '../src/lib/text.ts'
+import { checkAnswer, checkVocab, contractionKey, normalizeForComparison, vocabCandidates } from '../src/lib/text.ts'
 import type { Exercise } from '../src/types.ts'
 import { correctionStepExercises, grammarStepExercises, pathUnits, phraseStepExercises, practiceStepExercises, recapExercises, wordStepExercises } from '../src/lib/path.ts'
 
@@ -24,6 +24,40 @@ function claim(id: string, where: string) {
   const prev = seen.get(id)
   if (prev) errors.push(`id en double « ${id} » (${prev} et ${where})`)
   else seen.set(id, where)
+}
+
+// Contractions : une réponse écrite avec « I'm » doit accepter « I am » (et inversement), pour tous les pronoms.
+const PRON = '(I|you|he|she|it|we|they|that|there|here|what|who|where|how|when|why|everyone|someone|nobody|everything|something|nothing)'
+const EXPAND: [RegExp, string][] = [
+  [new RegExp(`\\b${PRON}['’]m\\b`, 'gi'), '$1 am'], [new RegExp(`\\b${PRON}['’]re\\b`, 'gi'), '$1 are'], [new RegExp(`\\b${PRON}['’]s\\b`, 'gi'), '$1 is'],
+  [new RegExp(`\\b${PRON}['’]ve\\b`, 'gi'), '$1 have'], [new RegExp(`\\b${PRON}['’]ll\\b`, 'gi'), '$1 will'], [new RegExp(`\\b${PRON}['’]d\\b`, 'gi'), '$1 would'],
+]
+const CONTRACT: [RegExp, string][] = [
+  [/\bI am\b/g, "I'm"], [/\b(you|we|they) are\b/gi, "$1're"], [/\b(he|she|it|that|there|here|what|who|where|how) is\b/gi, "$1's"],
+  [/\b(I|you|we|they) have\b/gi, "$1've"], [/\b(I|you|he|she|it|we|they) will\b/gi, "$1'll"],
+]
+
+function checkContractions(ex: Exercise, at: string) {
+  if (EDITION.lang === 'nl') return
+  if (ex.kind === 'mcq') {
+    // Deux options qui ne diffèrent que par une contraction seraient toutes les deux justes : à éviter.
+    const keys = ex.options.map(contractionKey)
+    ex.options.forEach((o, i) => {
+      const j = keys.findIndex((k, jj) => jj < i && k === keys[i] && ex.options[jj] !== o)
+      if (j >= 0) errors.push(`${at} : les options « ${ex.options[j]} » et « ${o} » ne diffèrent que par une contraction`)
+    })
+    return
+  }
+  const lists: string[][] = ex.kind === 'cloze' ? ex.blanks : 'answers' in ex ? [ex.answers] : []
+  for (const answers of lists) {
+    for (const a of answers) {
+      for (const [re, rep] of [...EXPAND, ...CONTRACT]) {
+        if (!new RegExp(re.source, re.flags.replace('g', '')).test(a)) continue
+        const alt = a.replace(re, rep)
+        if (checkAnswer(alt, answers).verdict !== 'correct') errors.push(`${at} : « ${alt} » (variante avec / sans contraction de « ${a} ») n'est pas acceptée`)
+      }
+    }
+  }
 }
 
 function checkExercise(ex: Exercise, where: string) {
@@ -62,6 +96,7 @@ function checkExercise(ex: Exercise, where: string) {
       break
     }
   }
+  checkContractions(ex, at)
   if ('answers' in ex) {
     for (const a of ex.answers) {
       if (checkAnswer(a, ex.answers).verdict !== 'correct') errors.push(`${at} : la réponse « ${a} » n'est pas reconnue`)

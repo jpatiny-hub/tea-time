@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Exercise } from '../types'
-import { checkAnswer, checkVocab, shuffle, wordDiff, type AnswerVerdict } from '../lib/text'
+import { checkAnswer, checkGap, checkVocab, shuffle, wordDiff, type AnswerVerdict } from '../lib/text'
 import { addXp, recordAnswer } from '../lib/progress'
 import { getProgress } from '../lib/store'
 import { answerXp, levelInfo, perfectBonus, type AnswerQuality } from '../lib/xp'
@@ -104,7 +104,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
       setClosest(ex.options[ex.answer])
     } else if (ex.kind === 'gap' || ex.kind === 'fix' || ex.kind === 'transform') {
       if (!text.trim()) return
-      const res = checkAnswer(text, ex.answers, ex.kind === 'fix' ? ex.wrong : undefined)
+      const res = ex.kind === 'gap' ? checkGap(text, ex.answers, ex.prompt) : checkAnswer(text, ex.answers, ex.kind === 'fix' ? ex.wrong : undefined)
       setVerdict(res.verdict)
       setClosest(res.closest)
       if (canSpeak() && res.verdict !== 'wrong' && ex.kind !== 'gap') speak(res.closest)
