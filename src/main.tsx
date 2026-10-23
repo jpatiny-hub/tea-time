@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { getProgress, requestPersistentStorage } from './lib/store'
 import { applyAppearance } from './lib/appearance'
 import { installDomGuards, logError } from './lib/diagnostics'
+import './lib/mywords'
 import { ErrorBoundary } from './components/ErrorBoundary'
 
 installDomGuards()

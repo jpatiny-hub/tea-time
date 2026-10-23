@@ -8,6 +8,9 @@ import { canSpeak, speak } from '../lib/speech'
 import { TAG_LABELS } from '../data/content'
 import { btnPrimary, btnSecondary, card, hero, input, LevelBadge, Pill, SpeakButton } from './ui'
 import { EDITION } from '../edition'
+import { TapText } from './TapText'
+import { WordHelpPanel } from './WordHelp'
+import { looksFrench, quotedParts } from '../lib/lexicon'
 import type { AnswerCheck } from '../lib/text'
 
 interface Result {
@@ -332,6 +335,10 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
           </>
         )}
 
+        {ex.kind !== 'card' && !ex.audio && (
+          <WordHelpPanel key={`${ex.id}-${index}-${round}`} texts={helpTexts(ex, phase === 'feedback' ? closest : '')} context={helpContext(ex)} />
+        )}
+
         {phase === 'feedback' && ex.kind === 'card' && (
           <CardFeedback ex={ex} ok={isOk} verdict={verdict} override={override} given={text} onOverride={() => setOverride(true)} />
         )}
@@ -368,18 +375,48 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
   )
 }
 
+/** Textes (dans la langue apprise) dont on détaille les mots sous l'exercice. */
+function helpTexts(ex: Exercise, answer: string): string[] {
+  switch (ex.kind) {
+    case 'mcq':
+      // Question en français : seules les citations « … » comptent ; sinon la phrase et ses options.
+      return looksFrench(ex.prompt) ? quotedParts(ex.prompt) : [ex.prompt.replace(/\s{2}\(.*\)\s*$/, ''), ...ex.options]
+    case 'gap':
+      return [ex.prompt.replace('___', ' ').replace(/\s{2}\(.*\)\s*$/, ''), ...(answer ? [fillGap(ex.prompt, answer)] : [])]
+    case 'fix':
+      return [ex.wrong, ...(answer ? [answer] : [])]
+    case 'transform':
+      return ex.instruction.includes('français') ? [ex.prompt] : answer ? [answer] : []
+    case 'cloze':
+      return [ex.text.replace(/___/g, ' ')]
+    default:
+      return []
+  }
+}
+
+function helpContext(ex: Exercise): string {
+  switch (ex.kind) {
+    case 'mcq': return looksFrench(ex.prompt) ? ex.options[ex.answer] : ex.prompt
+    case 'gap': return ex.prompt.replace('___', '…')
+    case 'fix': return ex.wrong
+    case 'transform': return ex.instruction.includes('français') ? ex.prompt : ''
+    case 'cloze': return ex.text.replace(/___/g, '…')
+    default: return ''
+  }
+}
+
 function Prompt({ ex }: { ex: Exercise }) {
   switch (ex.kind) {
     case 'mcq':
-      return <p className="mt-3 text-base font-semibold">{ex.prompt}</p>
+      return <p className="mt-3 text-base font-semibold"><TapText text={ex.prompt} /></p>
     case 'gap': {
       const [before, after] = splitGap(ex.prompt)
       return (
         <div className="mt-3">
           <p className="text-lg font-medium leading-relaxed">
-            {before}
+            <TapText text={before} sentence={ex.prompt.replace('___', '…')} target />
             <span className="mx-1 inline-block min-w-12 border-b-2 border-indigo-500 text-center text-indigo-500">?</span>
-            {after}
+            <TapText text={after} sentence={ex.prompt.replace('___', '…')} target />
           </p>
           {ex.hint && <p className="mt-1 text-xs italic text-gray-400">Indice : {ex.hint}</p>}
         </div>
@@ -389,7 +426,7 @@ function Prompt({ ex }: { ex: Exercise }) {
       return (
         <div className="mt-3">
           {ex.context && <p className="text-xs italic text-gray-400">{ex.context}</p>}
-          <p className="text-lg font-medium text-red-600 dark:text-red-400">✗ {ex.wrong}</p>
+          <p className="text-lg font-medium text-red-600 dark:text-red-400">✗ <TapText text={ex.wrong} target /></p>
           <p className="mt-1 text-xs text-gray-400">Il y a au moins une erreur. Réécris la phrase correcte.</p>
         </div>
       )
@@ -397,7 +434,7 @@ function Prompt({ ex }: { ex: Exercise }) {
       return (
         <div className="mt-3">
           <p className="text-sm text-gray-500 dark:text-gray-400">{ex.instruction}</p>
-          {!ex.listen && <p className="mt-1 text-lg font-medium">{ex.prompt}</p>}
+          {!ex.listen && <p className="mt-1 text-lg font-medium">{ex.instruction.includes('français') ? <TapText text={ex.prompt} target /> : ex.prompt}</p>}
         </div>
       )
     default:
@@ -589,7 +626,7 @@ function ClozeView({
           const width = Math.max(4, Math.min(16, Math.max(...(accepted ?? ['xxxx']).map((a) => a.length)) + 2))
           return (
             <span key={i}>
-              {part}
+              <TapText text={part} sentence={ex.text.replace(/___/g, '…')} target />
               {i < parts.length - 1 && (
                 <input
                   ref={i === 0 ? (inputRef as React.RefObject<HTMLInputElement>) : undefined}

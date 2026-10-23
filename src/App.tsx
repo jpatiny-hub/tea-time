@@ -31,6 +31,8 @@ import { EditionPicker } from './pages/EditionPicker'
 import { Translation } from './pages/Translation'
 import { TypedExercises } from './pages/TypedExercises'
 import { CHOSEN_EDITION, isGuided } from './edition'
+import { WordSheetHost } from './components/WordHelp'
+import { MyWords } from './pages/MyWords'
 import { Path } from './pages/Path'
 import { hasLexie } from './lib/path'
 import { PathUnitPage } from './pages/PathUnit'
@@ -146,6 +148,7 @@ function App() {
           <Route path="/grammaire" element={<Grammar />} />
           <Route path="/grammaire/:lessonId" element={<GrammarLessonPage />} />
           <Route path="/vocabulaire" element={<Vocabulary />} />
+          <Route path="/vocabulaire/mes-mots" element={<MyWords />} />
           <Route path="/vocabulaire/:deckId" element={<VocabDeckPage />} />
           <Route path="/pratique" element={<Practice />} />
           <Route path="/pratique/corrections" element={<Corrections />} />
@@ -171,6 +174,7 @@ function App() {
         )}
       </main>
       {!picking && <NavBar />}
+      {!picking && <WordSheetHost />}
     </div>
   )
 }

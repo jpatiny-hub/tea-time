@@ -28,6 +28,16 @@ export interface Attempt {
   lastOk: boolean
 }
 
+/** Un mot que l'utilisateur veut retravailler (ajouté en touchant un mot dans un exercice). */
+export interface MyWord {
+  /** Le mot dans la langue apprise (forme de base). */
+  en: string
+  fr: string
+  added: string
+  /** La phrase où il a été rencontré. */
+  example?: string
+}
+
 export interface WritingEntry {
   id: string
   taskId: string
@@ -57,6 +67,8 @@ export interface Settings {
   reminderHour: number
   /** Encart « Active ton rappel » masqué sur l'accueil. */
   reminderPromptDismissed: boolean
+  /** Aide vocabulaire : toucher un mot d'un exercice, d'un texte ou d'un dialogue pour voir sa traduction. */
+  wordHelp: boolean
   /** Parcours guidé : toutes les leçons et étapes sont accessibles sans suivre l'ordre. */
   pathFree: boolean
 }
@@ -70,6 +82,8 @@ export interface ProgressData {
   attempts: Record<string, Attempt>
   /** Réussites / échecs par étiquette (ex. 'present-perfect') pour repérer les points faibles. */
   tagStats: Record<string, { ok: number; ko: number }>
+  /** « Mes mots à retravailler » : clé = forme de base du mot. */
+  myWords: Record<string, MyWord>
   /** Étapes cochées dans les modules de cours : `${moduleId}:${step}`. */
   steps: Record<string, boolean>
   /** Nombre de réponses données par jour (AAAA-MM-JJ) — pour la série de jours. */
@@ -98,6 +112,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reminderHour: 19,
   reminderPromptDismissed: false,
   pathFree: false,
+  wordHelp: EDITION.id !== 'jojo',
 }
 
 function emptyData(): ProgressData {
@@ -108,6 +123,7 @@ function emptyData(): ProgressData {
     attempts: {},
     tagStats: {},
     steps: {},
+    myWords: {},
     activity: {},
     writing: [],
     drafts: {},
@@ -137,6 +153,7 @@ export function migrate(raw: unknown): ProgressData {
     attempts: { ...(data.attempts ?? {}) },
     tagStats: { ...(data.tagStats ?? {}) },
     steps: { ...(data.steps ?? {}) },
+    myWords: { ...(data.myWords ?? {}) },
     activity: { ...(data.activity ?? {}) },
     writing: Array.isArray(data.writing) ? data.writing : [],
     drafts: { ...(data.drafts ?? {}) },

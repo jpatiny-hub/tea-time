@@ -66,3 +66,9 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - Ne jamais lister « à la main » les deux formes pour contourner le problème, et ne jamais proposer deux options de QCM qui ne diffèrent que par une contraction.
 - `npm run check-data` vérifie tout cela (variantes avec / sans contraction de chaque réponse, options de QCM équivalentes) : une erreur bloque la publication.
 
+## Aide vocabulaire et voix (octobre 2026)
+- **Aide vocabulaire** (réglage `wordHelp`, activé par défaut sauf pour Jojo) : `components/TapText.tsx` rend les mots touchables (énoncés, textes à trous, dialogues, lectures) ; `components/WordHelp.tsx` contient la fenêtre de traduction (`WordSheetHost`, montée dans `App.tsx`) et le panneau « Mots de l'exercice » (`WordHelpPanel`) ; `lib/lexicon.ts` cherche d'abord dans les mots de l'utilisateur, puis dans le vocabulaire de l'appli, puis dans le dictionnaire de base `data/lexicon-en.ts` (format `forme1, forme2 = traduction`, formes de base + irrégulières seulement ; le pluriel, -ed, -ing… sont retrouvés par `baseForms`). Pour étoffer le dictionnaire : mesurer les mots manquants d'un accès puis ajouter des lignes.
+- Seuls les textes dans la langue apprise sont touchables : les consignes françaises ne le sont pas (sauf les citations « … »). Un indice français après deux espaces et entre parenthèses en fin d'énoncé (`phrase ___.  (traduction)`) est ignoré.
+- **Mes mots à retravailler** : `lib/mywords.ts`, `pages/MyWords.tsx` (`/vocabulaire/mes-mots`) ; mots stockés dans `progress.myWords`, cartes d'ids `mw-…` résolues par `setExerciseResolver` (content.ts) pour entrer dans la révision.
+- **Voix des dialogues** : `dialogueVoices()` dans `lib/speech.ts` attribue une voix distincte par personnage (genre deviné d'après le prénom, puis hauteur et débit écartés si le téléphone propose peu de voix).
+

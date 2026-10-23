@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { readingTexts } from '../data/reading'
 import { markStep } from '../lib/progress'
+import { TapText } from '../components/TapText'
 import { canSpeak, speak, speakQueued, stopSpeaking } from '../lib/speech'
 import { InlineQuiz } from '../components/InlineQuiz'
 import { btnSecondary, card, LevelBadge, Page, Section, SpeakButton } from '../components/ui'
@@ -38,7 +39,7 @@ export function ReadingTextPage() {
       <div className="space-y-3">
         {text.paragraphs.map((p, i) => (
           <div key={i} className={`${card} flex items-start justify-between gap-2`}>
-            <p className="leading-relaxed">{p}</p>
+            <p className="leading-relaxed"><TapText text={p} target /></p>
             <SpeakButton text={p} small />
           </div>
         ))}

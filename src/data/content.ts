@@ -227,9 +227,17 @@ for (const d of dialogues) {
   for (const q of d.questions) register(q, { label: `Écoute · ${d.title}`, link: `/pratique/ecoute/${d.id}` })
 }
 
+// Exercices fabriqués à l'exécution (ex. « mes mots à retravailler », ids `mw-…`) : fournis par un résolveur enregistré par l'appli.
+let extraResolver: ((id: string) => RegisteredExercise | undefined) | null = null
+export function setExerciseResolver(fn: (id: string) => RegisteredExercise | undefined) {
+  extraResolver = fn
+}
+
 export function getExercise(id: string): RegisteredExercise | undefined {
   const found = registry.get(id)
   if (found) return found
+  const dynamic = extraResolver?.(id)
+  if (dynamic) return dynamic
   const vocab = allVocab.find((v) => v.id === id)
   if (vocab) {
     const deck = deckOfVocab(id)

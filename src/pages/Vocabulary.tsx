@@ -41,7 +41,16 @@ export function Vocabulary() {
 
   return (
     <Page title="Vocabulaire" subtitle={`${allVocab.length} mots et expressions · ${masteredCount(data, allIds)} acquis`}>
-      <div className="grid grid-cols-2 gap-2">
+      {data.settings.wordHelp && (
+        <ListLink
+          to="/vocabulaire/mes-mots"
+          icon="⭐"
+          title="Mes mots à retravailler"
+          subtitle={Object.keys(data.myWords).length > 0 ? `${Object.keys(data.myWords).length} mot${Object.keys(data.myWords).length > 1 ? 's' : ''} ajouté${Object.keys(data.myWords).length > 1 ? 's' : ''} depuis les exercices` : 'Touche un mot dans un exercice pour l’ajouter ici'}
+        />
+      )}
+
+      <div className="mt-3 grid grid-cols-2 gap-2">
         <button
           disabled={due.length === 0}
           onClick={() => setRun({ items: toCards(shuffle(allVocab.filter((v) => due.includes(v.id))).slice(0, 30), data.settings.cardDirection), title: 'Révision du vocabulaire' })}

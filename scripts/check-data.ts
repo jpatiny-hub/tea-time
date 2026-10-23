@@ -13,6 +13,7 @@ import { extraPronunciation } from '../src/data/pronunciation.ts'
 import { changelog } from '../src/data/changelog.ts'
 import { themes } from '../src/data/themes.ts'
 import { EDITION } from '../src/edition.ts'
+import { CORE_EN } from '../src/data/lexicon-en.ts'
 import { checkAnswer, checkVocab, contractionKey, normalizeForComparison, vocabCandidates } from '../src/lib/text.ts'
 import type { Exercise } from '../src/types.ts'
 import { correctionStepExercises, grammarStepExercises, pathUnits, phraseStepExercises, practiceStepExercises, recapExercises, wordStepExercises } from '../src/lib/path.ts'
@@ -157,6 +158,11 @@ const count = (k: Exercise['kind']) => allExercises.filter((r) => r.exercise.kin
 console.log(`Contenu : ${sessions.length} séances, ${modules.length} modules, ${grammarLessons.length} leçons, ${allVocab.length} mots, ${allExercises.length} exercices`)
 console.log(`  (qcm ${count('mcq')}, trous ${count('gap')}, corrections ${count('fix')}, réécritures ${count('transform')})`)
 console.log(`  ${readingTexts.length} textes, ${dialogues.length} dialogues, ${writingTasks.length} sujets d'écrit`)
+
+// Dictionnaire de base (aide vocabulaire) : chaque ligne « formes = traduction ».
+CORE_EN.split('\n').forEach((line, i) => {
+  if (line.trim() && !/^[^=]+=.+$/.test(line)) errors.push(`lexicon-en : ligne ${i + 1} mal formée « ${line.slice(0, 40)} »`)
+})
 
 // Parcours guidé (Maman, Nunu) : chaque étape doit produire des exercices valides, aux ids uniques.
 {

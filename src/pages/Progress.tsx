@@ -171,6 +171,13 @@ export function Progress() {
           </div>
           <label className="flex items-center justify-between gap-3">
             <span>
+              <span className="block text-sm font-semibold">Aide vocabulaire</span>
+              <span className="block text-xs text-gray-500 dark:text-gray-400">Touche un mot d’un exercice, d’un texte ou d’un dialogue pour voir sa traduction et l’ajouter à « Mes mots à retravailler ».</span>
+            </span>
+            <input type="checkbox" checked={data.settings.wordHelp} onChange={(e) => setSetting('wordHelp', e.target.checked)} className="h-6 w-6 shrink-0 accent-indigo-600" />
+          </label>
+          <label className="flex items-center justify-between gap-3">
+            <span>
               <span className="block text-sm font-semibold">Mode daltonien (deutéranopie)</span>
               <span className="block text-xs text-gray-500 dark:text-gray-400">Bleu pour les bonnes réponses, orange pour les erreurs, pas de vert / rouge / rose.</span>
             </span>

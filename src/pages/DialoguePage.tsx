@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { dialogues } from '../data/dialogues'
 import { markStep } from '../lib/progress'
-import { canSpeak, speakQueued, stopSpeaking } from '../lib/speech'
+import { TapText } from '../components/TapText'
+import { canSpeak, dialogueVoices, speakQueued, stopSpeaking } from '../lib/speech'
 import { InlineQuiz } from '../components/InlineQuiz'
 import { btnPrimary, btnSecondary, card, LevelBadge, Page, Section, SpeakButton } from '../components/ui'
 
@@ -30,9 +31,10 @@ export function DialoguePage() {
     stopSpeaking()
     setPlaying(true)
     setPlays((p) => p + 1)
+    const voices = dialogueVoices(speakers)
     dialogue.lines.forEach((l, i) => {
       speakQueued(l.text, {
-        voiceVariant: speakers.indexOf(l.speaker),
+        ...voices[speakers.indexOf(l.speaker)],
         onEnd: i === dialogue.lines.length - 1 ? () => setPlaying(false) : undefined,
       })
     })
@@ -60,7 +62,7 @@ export function DialoguePage() {
         <div className="mt-3 space-y-2">
           {dialogue.lines.map((l, i) => (
             <div key={i} className={`${card} flex items-start justify-between gap-2 p-3`}>
-              <p className="text-sm"><span className="font-bold text-indigo-600 dark:text-indigo-400">{l.speaker}: </span>{l.text}</p>
+              <p className="text-sm"><span className="font-bold text-indigo-600 dark:text-indigo-400">{l.speaker}: </span><TapText text={l.text} target /></p>
               <SpeakButton text={l.text} small />
             </div>
           ))}

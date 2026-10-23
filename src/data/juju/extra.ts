@@ -57,6 +57,18 @@ export const jujuPronunciation: PronunciationItem[] = [
 
 export const jujuChangelog: ChangelogEntry[] = [
   {
+    version: 5,
+    date: '2026-10-23',
+    title: 'Voix distinctes et aide vocabulaire 📖',
+    changes: [
+      'Dans les dialogues d’écoute, chaque personnage a sa propre voix (féminine ou masculine selon le prénom), bien distincte des autres.',
+      'Aide vocabulaire : touche un mot d’un exercice, d’une lecture ou d’un dialogue pour voir sa traduction (réglage Progrès → Réglages → Aide vocabulaire).',
+      'Sous chaque exercice, « Mots de l’exercice » détaille les mots de l’énoncé.',
+      'Tu peux ajouter un mot à « Mes mots à retravailler » (Vocabulaire) : il se travaille avec des cartes et revient dans la révision. Si le mot est inconnu de l’appli, tu écris toi-même sa traduction.',
+      'Les contractions « it\'s », « he\'s », « there\'s »… sont maintenant acceptées dans les deux sens (it is / it has) dans tous les exercices.',
+    ],
+  },
+  {
     version: 4,
     date: '2026-10-20',
     title: 'Un parcours guidé 🧭',
