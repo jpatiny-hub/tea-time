@@ -21,7 +21,7 @@ export function DialoguePage() {
 
   const speakers = Array.from(new Set(dialogue.lines.map((l) => l.speaker)))
 
-  function play() {
+  function play(slow = false) {
     if (!dialogue) return
     if (playing) {
       stopSpeaking()
@@ -35,6 +35,7 @@ export function DialoguePage() {
     dialogue.lines.forEach((l, i) => {
       speakQueued(l.text, {
         ...voices[speakers.indexOf(l.speaker)],
+        rate: (voices[speakers.indexOf(l.speaker)].rate ?? 1) * (slow ? 0.7 : 1),
         onEnd: i === dialogue.lines.length - 1 ? () => setPlaying(false) : undefined,
       })
     })
@@ -47,7 +48,10 @@ export function DialoguePage() {
       back={themeId ? { to: `/themes/${themeId}`, label: 'Thème' } : moduleId ? { to: `/cours/module/${moduleId}`, label: 'Module' } : { to: '/pratique/ecoute', label: 'Écoute' }}
     >
       {canSpeak() ? (
-        <button onClick={play} className={btnPrimary}>{playing ? '⏹ Arrêter' : plays === 0 ? '▶️ Écouter le dialogue' : '🔁 Réécouter'}</button>
+        <div className="flex gap-2">
+          <button onClick={() => play()} className={btnPrimary}>{playing ? '⏹ Arrêter' : plays === 0 ? '▶️ Écouter le dialogue' : '🔁 Réécouter'}</button>
+          {!playing && <button onClick={() => play(true)} className={btnSecondary} aria-label="Écouter lentement">🐢 Lent</button>}
+        </div>
       ) : (
         <p className="text-sm text-gray-500">Synthèse vocale indisponible : lis le texte à la place.</p>
       )}

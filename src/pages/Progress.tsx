@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { drillExercises, TAG_LABELS } from '../data/content'
 import { allVocab } from '../data/vocabulary'
+import { OfflineStatus } from '../components/Status'
+import { shareBackup } from '../lib/backup'
 import { exportBackup, importBackup, resetProgress, updateProgress, useProgress, type Settings } from '../lib/store'
 import { daysSince, masteredCount, seenCount, streak, totalAnswers, weakTags } from '../lib/progress'
 import { canSpeak, speak } from '../lib/speech'
@@ -171,6 +173,13 @@ export function Progress() {
           </div>
           <label className="flex items-center justify-between gap-3">
             <span>
+              <span className="block text-sm font-semibold">Sons et vibrations</span>
+              <span className="block text-xs text-gray-500 dark:text-gray-400">Un petit son et une vibration à chaque bonne ou mauvaise réponse.</span>
+            </span>
+            <input type="checkbox" checked={data.settings.sounds} onChange={(e) => setSetting('sounds', e.target.checked)} className="h-6 w-6 shrink-0 accent-indigo-600" />
+          </label>
+          <label className="flex items-center justify-between gap-3">
+            <span>
               <span className="block text-sm font-semibold">Aide vocabulaire</span>
               <span className="block text-xs text-gray-500 dark:text-gray-400">Touche un mot d’un exercice, d’un texte ou d’un dialogue pour voir sa traduction et l’ajouter à « Mes mots à retravailler ».</span>
             </span>
@@ -216,7 +225,18 @@ export function Progress() {
             Dernière sauvegarde : {data.lastBackupAt ? `${formatDateFr(data.lastBackupAt)} (il y a ${backupAge} j)` : 'jamais'}
             {persisted !== null && <> · Stockage protégé : {persisted ? 'oui ✓' : 'non (le navigateur pourrait l\'effacer en cas de manque de place)'}</>}
           </p>
-          <button onClick={download} className={btnPrimary}>Télécharger une sauvegarde</button>
+          <OfflineStatus />
+          <p className="text-xs text-gray-500 dark:text-gray-400">Une copie automatique est aussi gardée chaque jour sur l’appareil (7 jours) : si la progression disparaît, l’appli propose de la retrouver. Cette copie disparaît avec les données du navigateur : pour être vraiment à l’abri, envoie-toi une sauvegarde.</p>
+          <button
+            onClick={async () => {
+              const r = await shareBackup()
+              setMessage(r === 'shared' ? '✓ Sauvegarde envoyée.' : r === 'downloaded' ? '✓ Fichier de sauvegarde téléchargé.' : '')
+            }}
+            className={btnPrimary}
+          >
+            📤 Envoyer ma sauvegarde (mail, WhatsApp, Drive…)
+          </button>
+          <button onClick={download} className={btnSecondary}>Télécharger un fichier de sauvegarde</button>
           <button onClick={() => fileRef.current?.click()} className={btnSecondary}>Restaurer depuis un fichier</button>
           <input
             ref={fileRef}

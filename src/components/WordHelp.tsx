@@ -79,7 +79,7 @@ export function WordSheetHost() {
             {entry && entry.base !== req.word.toLowerCase() && <p className="text-xs text-gray-500 dark:text-gray-400">forme de base : {entry.base}</p>}
           </div>
           <div className="flex items-center gap-2">
-            <SpeakButton text={req.word} />
+            <SpeakButton text={req.word} slow />
             <button onClick={closeWord} aria-label="Fermer" className="rounded-full bg-gray-100 px-3 py-1.5 text-sm font-bold dark:bg-gray-800">✕</button>
           </div>
         </div>

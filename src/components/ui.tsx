@@ -169,9 +169,9 @@ export function ProgressBar({ value, max, tone = 'indigo' }: { value: number; ma
   )
 }
 
-export function SpeakButton({ text, label, small }: { text: string; label?: string; small?: boolean }) {
+export function SpeakButton({ text, label, small, slow }: { text: string; label?: string; small?: boolean; slow?: boolean }) {
   if (!canSpeak()) return null
-  return (
+  const main = (
     <button
       type="button"
       onClick={(e) => {
@@ -185,6 +185,24 @@ export function SpeakButton({ text, label, small }: { text: string; label?: stri
     >
       🔊{label ? ` ${label}` : ''}
     </button>
+  )
+  if (!slow) return main
+  // Version lente (0,6×) à côté du bouton normal : utile pour bien entendre chaque mot.
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1.5">
+      {main}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation()
+          speak(text, { rate: 0.6 })
+        }}
+        aria-label="Écouter lentement"
+        className={`shrink-0 rounded-full bg-amber-50 font-semibold text-amber-800 ring-1 ring-amber-100 dark:bg-amber-500/15 dark:text-amber-200 dark:ring-amber-400/20 ${small ? 'px-2 py-1 text-sm' : 'px-3 py-1.5 text-sm'}`}
+      >
+        🐢
+      </button>
+    </span>
   )
 }
 

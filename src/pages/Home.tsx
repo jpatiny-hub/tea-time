@@ -12,6 +12,8 @@ import { seasonalTheme, themes } from '../data/themes'
 import { XpBar } from '../components/XpBar'
 import { EDITION, isDutch, isGuided, isJuju } from '../edition'
 import { ContinueCard } from './Path'
+import { OfflineBanner, RecoveryBanner } from '../components/Status'
+import { isDailyDone } from '../lib/daily'
 import { hasLexie } from '../lib/path'
 import { extra } from '../data/edition-content'
 import { formatDateFr } from '../lib/text'
@@ -55,7 +57,7 @@ export function Home() {
   const expr = expressionOfTheDay()
   const lastSession = sessions[sessions.length - 1]
   const backupAge = daysSince(data.lastBackupAt)
-  const needsBackup = answers >= 50 && (backupAge === null || backupAge > 30)
+  const needsBackup = answers >= 30 && (backupAge === null || backupAge > 7)
 
   const theme = seasonalTheme()
   const today = new Date()
@@ -101,6 +103,18 @@ export function Home() {
           <span className="text-2xl font-bold leading-none text-indigo-600">›</span>
         </Link>
       </div>
+
+      <OfflineBanner />
+      <RecoveryBanner />
+
+      <Link to="/session" className={`${cardLink} mt-3 flex items-center gap-3`}>
+        <IconTile icon={isDailyDone(data) ? '✅' : '🌟'} tone="amber" />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400">{isDailyDone(data) ? 'Terminée aujourd’hui' : '10 minutes pour aujourd’hui'}</p>
+          <p className="font-extrabold">Ma session du jour</p>
+        </div>
+        <span className="text-2xl font-bold leading-none text-amber-600">›</span>
+      </Link>
 
       {isGuided && <div className="mt-3"><ContinueCard /></div>}
       {hasLexie && (
@@ -153,7 +167,7 @@ export function Home() {
         <Link to="/progres#sauvegarde" className={`${cardLink} mt-3 flex items-center gap-3 text-sm`}>
           <IconTile icon="💾" tone="teal" size="sm" />
           <span className="flex-1">
-            {backupAge === null ? 'Pense à sauvegarder ta progression dans un fichier.' : `Dernière sauvegarde il y a ${backupAge} jours.`}
+            {backupAge === null ? 'Pense à envoyer une sauvegarde de ta progression (un geste).' : `Dernière sauvegarde il y a ${backupAge} jours : envoie-en une nouvelle.`}
           </span>
           <span className="text-2xl font-bold leading-none text-teal-600">›</span>
         </Link>

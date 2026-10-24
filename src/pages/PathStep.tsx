@@ -8,6 +8,7 @@ import {
   recapExercises, stepOf, unitOf, unitWords, wordStepExercises, type PathStep, type PathUnit,
 } from '../lib/path'
 import type { Exercise, GrammarLesson, VocabItem } from '../types'
+import { catchUpExercises } from '../lib/daily'
 import { ExerciseRunner } from '../components/ExerciseRunner'
 import { btnPrimary, btnSecondary, card, Page, Pill, Rich, SpeakButton } from '../components/ui'
 import { GrammarPointView } from './GrammarLesson'
@@ -77,7 +78,7 @@ function LearnWords({ unit, items, onDone }: { unit: PathUnit; items: VocabItem[
         <Pill tone="indigo">Nouveau mot {i + 1}/{items.length}</Pill>
         <p className="mt-3 text-3xl font-extrabold leading-tight">{it.en}</p>
         <p className="mt-1 text-lg font-semibold text-emerald-700 dark:text-emerald-300">{it.fr}</p>
-        <div className="mt-3 flex justify-center"><SpeakButton text={it.en} label="Écouter" /></div>
+        <div className="mt-3 flex justify-center"><SpeakButton text={it.en} label="Écouter" slow /></div>
         {it.note && <p className="mt-3 text-xs text-amber-700 dark:text-amber-400">⚠️ {it.note}</p>}
       </div>
 
@@ -88,7 +89,7 @@ function LearnWords({ unit, items, onDone }: { unit: PathUnit; items: VocabItem[
             {[it.example, ...phrases].filter((p): p is string => !!p).map((p) => (
               <li key={p} className="flex items-center justify-between gap-2 rounded-2xl bg-gray-50 px-3 py-2 text-sm dark:bg-white/5">
                 <span className="italic"><Highlighted sentence={p} word={it.en} /></span>
-                <SpeakButton text={p} small />
+                <SpeakButton text={p} small slow />
               </li>
             ))}
           </ul>
@@ -304,6 +305,8 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
       <ExerciseRunner
         key={exercisesKey}
         items={exercises}
+        resumeKey={step.id}
+        catchUp={(misses) => catchUpExercises(misses, new Set(exercises.map((e) => e.id)))}
         ordered={step.kind === 'words' || step.kind === 'grammar' || step.kind === 'practice' || step.kind === 'recap'}
         title={`${step.title} · ${mod.title}`}
         onExit={back}

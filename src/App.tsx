@@ -34,6 +34,7 @@ import { CHOSEN_EDITION, isGuided } from './edition'
 import { WordSheetHost } from './components/WordHelp'
 import { MyWords } from './pages/MyWords'
 import { Path } from './pages/Path'
+import { DailySession } from './pages/DailySession'
 import { hasLexie } from './lib/path'
 import { PathUnitPage } from './pages/PathUnit'
 import { PathStepPage } from './pages/PathStep'
@@ -163,6 +164,7 @@ function App() {
           <Route path="/pratique/lecture" element={<Reading />} />
           <Route path="/pratique/lecture/:textId" element={<ReadingTextPage />} />
           <Route path="/revision" element={<Revision />} />
+          <Route path="/session" element={<DailySession />} />
           <Route path="/progres" element={<Progress />} />
           <Route path="/nouveautes" element={<News />} />
           <Route path="/entrainement" element={<Drill />} />

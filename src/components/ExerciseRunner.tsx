@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Exercise } from '../types'
 import { checkAnswer, checkGap, checkVocab, shuffle, wordDiff, type AnswerVerdict } from '../lib/text'
 import { addXp, recordAnswer } from '../lib/progress'
-import { getProgress } from '../lib/store'
+import { getProgress, updateProgress } from '../lib/store'
+import { playFeedback } from '../lib/feedback'
 import { answerXp, levelInfo, perfectBonus, type AnswerQuality } from '../lib/xp'
 import { canSpeak, speak } from '../lib/speech'
 import { TAG_LABELS } from '../data/content'
@@ -29,6 +30,10 @@ interface Props {
   /** Parcours guidé : bouton principal de l'écran de fin (ex. « Étape suivante »). */
   onNext?: () => void
   nextLabel?: string
+  /** Identifiant de la série : si on la quitte en cours de route, on propose de la reprendre au même endroit. */
+  resumeKey?: string
+  /** Après la série : propose un rattrapage ciblé sur ce qui a été raté (liste d'exercices, vide = pas de bouton). */
+  catchUp?: (misses: Exercise[]) => Exercise[]
   /** true : garder l'ordre donné (parcours guidé : du plus guidé au plus libre). Sinon l'ordre des questions est mélangé. */
   ordered?: boolean
 }
@@ -44,7 +49,36 @@ const kindLabel: Record<Exercise['kind'], string> = {
   cloze: 'Texte à trous',
 }
 
-export function ExerciseRunner({ items, title, onExit, onFinish, record = true, onNext, nextLabel, ordered = false }: Props) {
+interface Draft {
+  items: Exercise[]
+  index: number
+  results: Result[]
+  combo: number
+  sessionXp: number
+}
+
+function readDraft(key?: string): Draft | null {
+  if (!key) return null
+  try {
+    const raw = getProgress().drafts[`run:${key}`]
+    const d = raw ? (JSON.parse(raw) as Draft) : null
+    return d && d.index > 0 && d.index < d.items.length ? d : null
+  } catch {
+    return null
+  }
+}
+
+function writeDraft(key: string | undefined, draft: Draft | null) {
+  if (!key) return
+  updateProgress((p) => {
+    const drafts = { ...p.drafts }
+    if (draft) drafts[`run:${key}`] = JSON.stringify(draft)
+    else delete drafts[`run:${key}`]
+    return { ...p, drafts }
+  })
+}
+
+export function ExerciseRunner({ items, title, onExit, onFinish, record = true, onNext, nextLabel, ordered = false, resumeKey, catchUp }: Props) {
   // Les questions arrivent dans un ordre différent à chaque fois (les options des QCM sont aussi mélangées, plus bas).
   const [queue, setQueue] = useState(() => (ordered ? items : shuffle(items)))
   const [index, setIndex] = useState(0)
@@ -59,6 +93,8 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
   const [blankResults, setBlankResults] = useState<AnswerCheck[]>([])
   const [results, setResults] = useState<Result[]>([])
   const [done, setDone] = useState(false)
+  const [pending, setPending] = useState<Draft | null>(() => readDraft(resumeKey))
+  const [catchList, setCatchList] = useState<Exercise[]>([])
   const [round, setRound] = useState(0)
   // Gamification : série de bonnes réponses, XP de la session, XP au départ (pour détecter un passage de niveau).
   const [combo, setCombo] = useState(0)
@@ -74,7 +110,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
   const order = useMemo(() => (ex?.kind === 'mcq' ? shuffle(ex.options.map((_, i) => i)) : []), [ex, round, index])
 
   useEffect(() => {
-    if (!ex) return
+    if (!ex || pending) return
     setPhase('answer')
     setText(ex.kind === 'fix' ? ex.wrong : '')
     setBlanks(ex.kind === 'cloze' ? ex.blanks.map(() => '') : [])
@@ -87,7 +123,39 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
     if (ex.audio && canSpeak()) speak(ex.audio)
     const t = setTimeout(() => (ex.audio ? undefined : inputRef.current?.focus({ preventScroll: true })), 50)
     return () => clearTimeout(t)
-  }, [ex, round, index])
+  }, [ex, round, index, pending])
+
+  // Retour immédiat : petit son et vibration à chaque réponse.
+  useEffect(() => {
+    if (phase === 'feedback') playFeedback(override || verdict === 'correct' || verdict === 'typo' ? 'ok' : 'ko')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
+  if (pending) {
+    return (
+      <div className="px-4 pt-6">
+        <div className={`${card} p-5 text-center`}>
+          <p className="text-3xl">⏸️</p>
+          <p className="mt-2 text-lg font-extrabold">Reprendre où tu t’étais arrêté ?</p>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">Tu en étais à la question {pending.index + 1} sur {pending.items.length}.</p>
+          <button
+            onClick={() => {
+              setQueue(pending.items)
+              setIndex(pending.index)
+              setResults(pending.results)
+              setCombo(pending.combo)
+              setSessionXp(pending.sessionXp)
+              setPending(null)
+            }}
+            className={`${btnPrimary} mt-4`}
+          >
+            Reprendre
+          </button>
+          <button onClick={() => { writeDraft(resumeKey, null); setPending(null) }} className={`${btnSecondary} mt-3`}>Recommencer depuis le début</button>
+        </div>
+      </div>
+    )
+  }
 
   if (!ex && !done) {
     return (
@@ -154,9 +222,13 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
     setResults(nextResults)
     if (index + 1 < queue.length) {
       setIndex(index + 1)
+      writeDraft(resumeKey, { items: queue, index: index + 1, results: nextResults, combo: nextCombo, sessionXp: nextSessionXp })
     } else {
       setDone(true)
+      writeDraft(resumeKey, null)
       const correct = nextResults.filter((r) => r.ok).length
+      if (correct === nextResults.length) setTimeout(() => playFeedback('win'), 350)
+      if (catchUp) setCatchList(catchUp(nextResults.filter((r) => !r.ok).map((r) => r.exercise)))
       const bonus = record ? perfectBonus(nextSessionXp, nextResults.length, nextResults.length - correct) : 0
       if (bonus > 0) addXp(bonus)
       setBonusXp(bonus)
@@ -173,6 +245,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
     setCombo(0)
     setSessionXp(0)
     setBonusXp(0)
+    setCatchList([])
     setStartXp(getProgress().xp)
   }
 
@@ -218,6 +291,11 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
           </div>
         )}
 
+        {catchList.length > 0 && (
+          <button onClick={() => restartWith(catchList)} className={`${btnPrimary} mt-4`}>
+            🎯 Rattrapage ciblé ({catchList.length})
+          </button>
+        )}
         {onNext && <button onClick={onNext} className={`${btnPrimary} mt-4`}>{nextLabel ?? 'Continuer →'}</button>}
         <button onClick={onExit} className={`${btnSecondary} mt-3`}>Terminer</button>
       </div>
@@ -260,7 +338,7 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
           <>
             {ex.audio && (
               <div className="mt-3 flex items-center gap-3 rounded-2xl bg-indigo-50 p-3 dark:bg-indigo-500/10">
-                <SpeakButton text={ex.audio} label="Réécouter" />
+                <SpeakButton text={ex.audio} label="Réécouter" slow />
                 <span className="text-xs text-gray-500 dark:text-gray-400">Écoute bien, tu peux réécouter autant que tu veux.</span>
               </div>
             )}
@@ -459,7 +537,7 @@ function Feedback({
   const others = 'answers' in ex ? ex.answers.filter((a) => a !== closest).slice(0, 3) : []
   const typed = ex.kind !== 'mcq'
   return (
-    <div className="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+    <div className={`mt-4 border-t border-gray-100 pt-4 dark:border-gray-800 ${ok ? 'fb-ok' : 'fb-ko'}`}>
       {ok ? (
         <p className="font-semibold text-green-600">
           ✓ {override ? 'Validé' : verdict === 'typo' ? 'Correct — attention à l\'orthographe' : 'Correct !'}
@@ -567,7 +645,7 @@ function CardFeedback({
   onOverride: () => void
 }) {
   return (
-    <div className="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+    <div className={`mt-4 border-t border-gray-100 pt-4 dark:border-gray-800 ${ok ? 'fb-ok' : 'fb-ko'}`}>
       {ok ? (
         <p className="font-semibold text-green-600">
           ✓ {override ? 'Validé' : verdict === 'typo' ? 'Accepté — petite faute d\'orthographe' : 'Correct !'}
@@ -677,7 +755,7 @@ function ClozeFeedback({
   const typos = results.filter((r) => r.verdict === 'typo')
   const rightCount = results.filter((r) => r.verdict !== 'wrong').length
   return (
-    <div className="mt-4 border-t border-gray-100 pt-4 dark:border-gray-800">
+    <div className={`mt-4 border-t border-gray-100 pt-4 dark:border-gray-800 ${ok ? 'fb-ok' : 'fb-ko'}`}>
       {ok ? (
         <p className="font-semibold text-green-600">✓ {override ? 'Validé' : verdict === 'typo' ? "Correct — attention à l'orthographe" : 'Correct !'}</p>
       ) : (

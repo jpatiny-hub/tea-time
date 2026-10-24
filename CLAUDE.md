@@ -72,3 +72,9 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - **Mes mots à retravailler** : `lib/mywords.ts`, `pages/MyWords.tsx` (`/vocabulaire/mes-mots`) ; mots stockés dans `progress.myWords`, cartes d'ids `mw-…` résolues par `setExerciseResolver` (content.ts) pour entrer dans la révision.
 - **Voix des dialogues** : `dialogueVoices()` dans `lib/speech.ts` attribue une voix distincte par personnage (genre deviné d'après le prénom, puis hauteur et débit écartés si le téléphone propose peu de voix).
 
+## Session du jour, reprise, retours, sauvegardes (octobre 2026)
+- `lib/daily.ts` : `buildDailySession` (≈12 exercices : à réviser, point faible, nouveau, écoute) et `catchUpExercises` (rattrapage ciblé après une série ; mots → autre forme du même mot, notions → autres exercices de la même étiquette). Page `/session` ; fin de session marquée `steps['daily:AAAA-MM-JJ']`.
+- `ExerciseRunner` : `resumeKey` (reprise d'une série quittée, stockée dans `drafts['run:<clé>']`, supprimée à la fin), `catchUp`, `ordered`. Sons et vibrations : `lib/feedback.ts` (WebAudio, réglage `sounds`) ; fondu de couleur `.fb-ok` / `.fb-ko` (pas de mouvement).
+- `SpeakButton slow` affiche aussi 🐢 (voix à 0,6×).
+- `lib/backup.ts` : instantané quotidien dans IndexedDB (7 jours, restaurable depuis l'accueil si la progression a disparu) et `shareBackup` (menu de partage du téléphone, repli : téléchargement). `components/Status.tsx` : bandeau hors ligne, état du mode hors ligne, bandeau de récupération.
+

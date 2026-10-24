@@ -67,6 +67,8 @@ export interface Settings {
   reminderHour: number
   /** Encart « Active ton rappel » masqué sur l'accueil. */
   reminderPromptDismissed: boolean
+  /** Petits sons (bonne / mauvaise réponse, célébrations) et vibrations. */
+  sounds: boolean
   /** Aide vocabulaire : toucher un mot d'un exercice, d'un texte ou d'un dialogue pour voir sa traduction. */
   wordHelp: boolean
   /** Parcours guidé : toutes les leçons et étapes sont accessibles sans suivre l'ordre. */
@@ -113,6 +115,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reminderPromptDismissed: false,
   pathFree: false,
   wordHelp: EDITION.id !== 'jojo',
+  sounds: true,
 }
 
 function emptyData(): ProgressData {

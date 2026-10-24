@@ -5,6 +5,19 @@ import { extra } from './edition-content.ts'
 // `version` = précédente + 1 : l'accueil affichera une bannière « Nouveautés ».
 const jojoChangelog: ChangelogEntry[] = [
   {
+    version: 12,
+    date: '2026-10-24',
+    title: 'Ma session du jour 🌟',
+    changes: [
+      'Nouvelle « Ma session du jour » sur l’accueil : environ 12 exercices qui mélangent révision, point faible, nouveauté et écoute. +15 XP à la fin.',
+      'Après une série, un « Rattrapage ciblé » propose d’autres exercices sur ce qui a été raté, présentés autrement.',
+      'Tu peux quitter une série en cours : l’appli propose de la reprendre là où tu t’étais arrêté.',
+      'Petits sons et vibrations à chaque réponse (désactivables dans Progrès → Réglages).',
+      'Bouton 🐢 pour écouter lentement les mots, les phrases et les dialogues.',
+      'Bandeau « Pas de connexion » rassurant, et sauvegarde plus simple : « Envoyer ma sauvegarde » (mail, WhatsApp, Drive…) et copie automatique quotidienne sur l’appareil.',
+    ],
+  },
+  {
     version: 11,
     date: '2026-10-23',
     title: 'Voix distinctes et aide vocabulaire 📖',
