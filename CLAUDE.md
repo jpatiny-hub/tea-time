@@ -83,3 +83,7 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - Navigation : accès simplifiés (`isBasic`) = 5 onglets + page `/plus` (`pages/Plus.tsx`, réutilise `sections` de Home) ; Jojo garde 6 onglets.
 - Célébrations : mascotte « Tea » (`tea_mascot`) et confettis en fin de série ≥ 70 %, trophée si 100 % et en fin de leçon, fête aux paliers de série de jours (`steps['celebrated:streak:N']`).
 
+## Jeu de rôle et traductions (octobre 2026)
+- `components/RolePlay.tsx` : jeu de rôle sur un dialogue (voix distinctes, reconnaissance vocale, repli sans micro) ; bouton dans `DialoguePage` et étape facultative `roleplay` du parcours (dialogues à 2 personnages ou plus).
+- Traductions françaises : dialogues et lectures dans `data/<accès>/translations.ts` (rattachées par `data/translations.ts`, bouton « Voir en français »), phrases d'exemple du vocabulaire dans `data/<accès>/examples-fr.ts` (clé = la phrase exacte, `data/examples.ts`). `check-data` exige une traduction pour chaque phrase (sauf Jojo) : en ajoutant un exemple, ajouter sa traduction.
+

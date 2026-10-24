@@ -9,7 +9,10 @@ import {
 } from '../lib/path'
 import type { Exercise, GrammarLesson, VocabItem } from '../types'
 import { catchUpExercises } from '../lib/daily'
+import { exampleFr } from '../data/examples'
 import { WordSprite } from '../components/Pixel'
+import { RolePlay } from '../components/RolePlay'
+import { dialogues } from '../data/dialogues'
 import { ExerciseRunner } from '../components/ExerciseRunner'
 import { btnPrimary, btnSecondary, card, Page, Pill, Rich, SpeakButton } from '../components/ui'
 import { GrammarPointView } from './GrammarLesson'
@@ -69,6 +72,7 @@ function Repeat({ target }: { target: string }) {
 
 function LearnWords({ unit, items, onDone }: { unit: PathUnit; items: VocabItem[]; onDone: () => void }) {
   const [i, setI] = useState(0)
+  const [showFr, setShowFr] = useState(false)
   const it = items[i]
   // D'autres phrases du thème où le mot réapparaît : le mot est vu dans plusieurs contextes.
   const phrases = useMemo(
@@ -93,19 +97,25 @@ function LearnWords({ unit, items, onDone }: { unit: PathUnit; items: VocabItem[
           <ul className="mt-2 space-y-2">
             {[it.example, ...phrases].filter((p): p is string => !!p).map((p) => (
               <li key={p} className="flex items-center justify-between gap-2 rounded-2xl bg-gray-50 px-3 py-2 text-sm dark:bg-white/5">
-                <span className="italic"><Highlighted sentence={p} word={it.en} /></span>
+                <span>
+                  <span className="italic"><Highlighted sentence={p} word={it.en} /></span>
+                  {showFr && exampleFr(p) && <span className="mt-0.5 block text-xs text-gray-500 dark:text-gray-400">{exampleFr(p)}</span>}
+                </span>
                 <SpeakButton text={p} small slow />
               </li>
             ))}
           </ul>
+          {[it.example, ...phrases].some((p) => exampleFr(p)) && (
+            <button onClick={() => setShowFr(!showFr)} className="mt-2 text-xs font-semibold text-indigo-600 underline dark:text-indigo-300">{showFr ? 'Masquer la traduction' : '🇫🇷 Voir en français'}</button>
+          )}
         </div>
       )}
 
       <Repeat target={it.en.replace(/\(.*?\)/g, '').split(' / ')[0].replace(/[…?!]+$/, '')} />
 
       <div className="mt-4 flex gap-3">
-        {i > 0 && <button onClick={() => setI(i - 1)} className={btnSecondary}>←</button>}
-        <button onClick={() => (i + 1 < items.length ? setI(i + 1) : onDone())} className={btnPrimary}>
+        {i > 0 && <button onClick={() => { setI(i - 1); setShowFr(false) }} className={btnSecondary}>←</button>}
+        <button onClick={() => { setShowFr(false); if (i + 1 < items.length) setI(i + 1); else onDone() }} className={btnPrimary}>
           {i + 1 < items.length ? 'Mot suivant →' : 'Passer aux exercices →'}
         </button>
       </div>
@@ -278,6 +288,16 @@ function StepPlayer({ unit, step }: { unit: PathUnit; step: PathStep }) {
   const goNext = () => navigate(next ? `/parcours/${next.unit.id}/${next.step.key}` : home)
   const back = () => navigate(`/parcours/${unit.id}`)
   const nextLabel = next ? (next.unit.id !== unit.id ? 'Leçon suivante →' : 'Étape suivante →') : 'Retour au parcours'
+
+  // Jeu de rôle oral : on joue un personnage du dialogue du thème.
+  if (step.kind === 'roleplay') {
+    const dlg = dialogues.find((d) => d.id === mod.dialogueId)
+    return (
+      <Page title={`${step.icon} ${step.title}`} subtitle={<>{unit.track === 'lexie' ? 'Lexie' : 'Leçon'} {unit.number} · {mod.titleFr}</>} back={{ to: `/parcours/${unit.id}`, label: 'Leçon' }}>
+        {dlg ? <RolePlay dialogue={dlg} onClose={back} onFinish={() => markDone(step)} onNext={goNext} nextLabel={nextLabel} /> : null}
+      </Page>
+    )
+  }
 
   // Étapes sans exercices : dialogue, lecture, défi écrit.
   if (step.kind === 'dialogue' || step.kind === 'reading' || step.kind === 'write') {

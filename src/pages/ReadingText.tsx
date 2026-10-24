@@ -14,6 +14,7 @@ export function ReadingTextPage() {
   const themeId = params.get('theme')
   const text = readingTexts.find((t) => t.id === textId)
   const [playing, setPlaying] = useState(false)
+  const [showFr, setShowFr] = useState(false)
 
   if (!text) return <Page title="Texte introuvable" back={{ to: '/pratique/lecture', label: 'Lecture' }}>{null}</Page>
 
@@ -36,11 +37,17 @@ export function ReadingTextPage() {
       {canSpeak() && (
         <button onClick={playAll} className={`${btnSecondary} mb-3`}>{playing ? '⏹ Arrêter la lecture' : '🔊 Écouter tout le texte'}</button>
       )}
+      {text.paragraphsFr && (
+        <button onClick={() => setShowFr(!showFr)} className="mb-3 w-full text-center text-sm font-semibold text-indigo-600 underline dark:text-indigo-300">{showFr ? 'Masquer la traduction' : '🇫🇷 Voir en français'}</button>
+      )}
       <div className="space-y-3">
         {text.paragraphs.map((p, i) => (
           <div key={i} className={`${card} flex items-start justify-between gap-2`}>
-            <p className="leading-relaxed"><TapText text={p} target /></p>
-            <SpeakButton text={p} small />
+            <div>
+              <p className="leading-relaxed"><TapText text={p} target /></p>
+              {showFr && text.paragraphsFr?.[i] && <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">{text.paragraphsFr[i]}</p>}
+            </div>
+            <SpeakButton text={p} small slow />
           </div>
         ))}
       </div>

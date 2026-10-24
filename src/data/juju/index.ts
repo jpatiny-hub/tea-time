@@ -1,3 +1,4 @@
+import { jujuExamplesFr } from './examples-fr.ts'
 import type { EditionContent } from '../edition-content.ts'
 import { jujuGrammarGroups, jujuGrammarLessons } from './grammar.ts'
 import { jujuDecks } from './vocabulary.ts'
@@ -16,6 +17,7 @@ export const jujuContent: EditionContent = {
   translations: jujuTranslations,
   pronunciation: jujuPronunciation,
   changelog: jujuChangelog,
+  examplesFr: jujuExamplesFr,
   expressionDeckIds: ['jj-idioms', 'jj-fluency'],
   ui: {
     coursesLabel: 'Mes modules',

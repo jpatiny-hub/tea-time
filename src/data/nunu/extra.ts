@@ -223,4 +223,12 @@ export const nunuChangelog: ChangelogEntry[] = [
       'Célébrations : la mascotte Tea et des confettis en fin de série, un trophée à la fin d’une leçon, une fête aux paliers de jours d’affilée (3, 7, 14, 30…).',
     ],
   },
+  {
+    version: 6,
+    date: '2026-10-24',
+    title: 'Parler plus et voir en français 🎭',
+    changes: [
+      'Nouveau jeu de rôle : choisis un personnage d’un dialogue, l’appli joue les autres avec leurs voix et tu dis tes répliques à voix haute (la reconnaissance vocale te dit si c’est bon). Aussi dans le Parcours, après chaque dialogue (facultatif).',
+    ],
+  },
 ]

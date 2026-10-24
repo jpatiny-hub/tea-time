@@ -5,6 +5,14 @@ import { extra } from './edition-content.ts'
 // `version` = précédente + 1 : l'accueil affichera une bannière « Nouveautés ».
 const jojoChangelog: ChangelogEntry[] = [
   {
+    version: 14,
+    date: '2026-10-24',
+    title: 'Parler plus et voir en français 🎭',
+    changes: [
+      'Nouveau jeu de rôle : choisis un personnage d’un dialogue, l’appli joue les autres avec leurs voix et tu dis tes répliques à voix haute (la reconnaissance vocale te dit si c’est bon). Aussi dans le Parcours, après chaque dialogue (facultatif).',
+    ],
+  },
+  {
     version: 13,
     date: '2026-10-24',
     title: 'Interface allégée et pixel art 🎨',

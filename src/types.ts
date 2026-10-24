@@ -124,6 +124,8 @@ export interface VocabItem {
   fr: string
   level: Level
   example?: string
+  /** Traduction de la phrase d'exemple. */
+  exampleFr?: string
   note?: string
 }
 
@@ -239,6 +241,8 @@ export interface ReadingText {
   level: Level
   module?: ModuleId
   paragraphs: string[]
+  /** Traduction française de chaque paragraphe (bouton « Voir en français »). */
+  paragraphsFr?: string[]
   glossary: { en: string; fr: string }[]
   questions: McqExercise[]
 }
@@ -249,7 +253,8 @@ export interface Dialogue {
   level: Level
   module?: ModuleId
   context: string
-  lines: { speaker: string; text: string }[]
+  /** `fr` : traduction de la réplique (bouton « Voir en français »). */
+  lines: { speaker: string; text: string; fr?: string }[]
   questions: McqExercise[]
 }
 

@@ -9,6 +9,7 @@ import { canSpeak, speak } from '../lib/speech'
 import { TAG_LABELS } from '../data/content'
 import { btnPrimary, btnSecondary, card, hero, input, LevelBadge, Pill, SpeakButton } from './ui'
 import { EDITION } from '../edition'
+import { exampleFr } from '../data/examples'
 import { TapText } from './TapText'
 import { Confetti, Pixel, WordSprite } from './Pixel'
 import { WordHelpPanel } from './WordHelp'
@@ -669,7 +670,7 @@ function CardFeedback({
         </p>
         <SpeakButton text={ex.example ? `${ex.speak}. ${ex.example}` : ex.speak} small />
       </div>
-      {ex.example && <p className="mt-1 text-sm italic text-gray-500 dark:text-gray-400">« {ex.example} »</p>}
+      {ex.example && <p className="mt-1 text-sm italic text-gray-500 dark:text-gray-400">« {ex.example} »{exampleFr(ex.example) && <span className="block text-xs not-italic">{exampleFr(ex.example)}</span>}</p>}
       {ex.note && <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">⚠️ {ex.note}</p>}
       {!ok && given.trim() && (
         <button onClick={onOverride} className="mt-3 text-xs text-indigo-600 underline dark:text-indigo-400">

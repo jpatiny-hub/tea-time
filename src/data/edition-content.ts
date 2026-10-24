@@ -36,6 +36,8 @@ export interface EditionContent {
   expressionDeckIds: string[]
   /** Verbes irréguliers propres à l'accès (sinon : la liste anglaise des niveaux 1 et 2). */
   irregularVerbs?: IrregularVerb[]
+  /** Traductions françaises des phrases d'exemple du vocabulaire (clé = la phrase). */
+  examplesFr?: Record<string, string>
   ui: EditionUi
 }
 

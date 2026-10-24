@@ -16,7 +16,7 @@ import { vocabCard } from '../data/content.ts'
 import { shuffle } from './text.ts'
 import type { ProgressData } from './store'
 
-export type StepKind = 'words' | 'phrases' | 'grammar' | 'corrections' | 'dialogue' | 'reading' | 'practice' | 'recap' | 'write'
+export type StepKind = 'words' | 'phrases' | 'grammar' | 'corrections' | 'dialogue' | 'roleplay' | 'reading' | 'practice' | 'recap' | 'write'
 
 /** Deux parcours indépendants : le principal, et « Lexie » (accès Jujularage). */
 export type Track = 'main' | 'lexie'
@@ -128,6 +128,10 @@ function buildUnits(): PathUnit[] {
 
     if (mod.keyPhrases.length > 0) steps.push(make('phrases', { kind: 'phrases', icon: '💬', title: 'Phrases utiles', subtitle: 'Écouter, répéter et écrire les phrases du thème' }))
     if (mod.dialogueId) steps.push(make('dialogue', { kind: 'dialogue', icon: '🎧', title: 'Écouter un dialogue', subtitle: 'Une conversation de la vie quotidienne' }))
+    const dlg = mod.dialogueId ? dialogues.find((d) => d.id === mod.dialogueId) : undefined
+    if (dlg && new Set(dlg.lines.map((l) => l.speaker)).size >= 2) {
+      steps.push(make('roleplay', { kind: 'roleplay', icon: '🎭', title: 'Jouer le dialogue', subtitle: 'Tu joues un rôle à voix haute, l’appli joue l’autre', optional: true }))
+    }
     if (mod.readingId) steps.push(make('reading', { kind: 'reading', icon: '📰', title: 'Lire un petit texte', subtitle: 'Comprendre le thème dans un texte' }))
     const nCorr = Math.ceil(corrections(mod).length / PRACTICE_CHUNK)
     for (let p = 0; p < nCorr; p++) {

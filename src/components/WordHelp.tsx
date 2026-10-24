@@ -4,6 +4,7 @@ import { baseForms, expressionAround, helpWords, lookup } from '../lib/lexicon'
 import { addMyWord, removeMyWord } from '../lib/mywords'
 import { closeWord, openWord, useWordRequest } from '../lib/wordsheet'
 import { EDITION } from '../edition'
+import { exampleFr } from '../data/examples'
 import { WordSprite } from './Pixel'
 import { btnPrimary, btnSecondary, input, SpeakButton } from './ui'
 
@@ -100,7 +101,9 @@ export function WordSheetHost() {
         )}
 
         {expr && <p className="mt-2 text-sm"><span className="text-gray-500 dark:text-gray-400">Dans cette phrase, l’expression </span><b>« {expr.text} »</b><span className="text-gray-500 dark:text-gray-400"> veut dire </span><b>{expr.fr}</b>.</p>}
-        {entry?.example && <p className="mt-2 text-sm italic text-gray-500 dark:text-gray-400">« {entry.example} »</p>}
+        {entry?.example && (
+          <p className="mt-2 text-sm italic text-gray-500 dark:text-gray-400">« {entry.example} »{exampleFr(entry.example) && <span className="block not-italic text-xs">{exampleFr(entry.example)}</span>}</p>
+        )}
         {req.sentence && req.sentence !== req.word && <p className="mt-2 text-xs text-gray-400">Dans : « {req.sentence.length > 120 ? `${req.sentence.slice(0, 118)}…` : req.sentence} »</p>}
 
         <div className="mt-4 flex gap-3">

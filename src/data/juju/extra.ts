@@ -57,6 +57,14 @@ export const jujuPronunciation: PronunciationItem[] = [
 
 export const jujuChangelog: ChangelogEntry[] = [
   {
+    version: 8,
+    date: '2026-10-24',
+    title: 'Parler plus et voir en français 🎭',
+    changes: [
+      'Nouveau jeu de rôle : choisis un personnage d’un dialogue, l’appli joue les autres avec leurs voix et tu dis tes répliques à voix haute (la reconnaissance vocale te dit si c’est bon). Aussi dans le Parcours, après chaque dialogue (facultatif).',
+    ],
+  },
+  {
     version: 7,
     date: '2026-10-24',
     title: 'Interface allégée et pixel art 🎨',

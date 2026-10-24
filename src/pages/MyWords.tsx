@@ -7,6 +7,7 @@ import { myWordItems, removeMyWord } from '../lib/mywords'
 import { shuffle } from '../lib/text'
 import type { CardExercise } from '../types'
 import { ExerciseRunner } from '../components/ExerciseRunner'
+import { exampleFr } from '../data/examples'
 import { WordSprite, Pixel } from '../components/Pixel'
 import { btnPrimary, card, Page, ProgressBar, SpeakButton } from '../components/ui'
 
@@ -38,7 +39,7 @@ export function MyWords() {
                 <WordSprite word={w.en} size={40} />
                 <div className="min-w-0 flex-1">
                   <p className="font-extrabold">{w.en} <span className="font-semibold text-emerald-700 dark:text-emerald-300">— {w.fr}</span></p>
-                  {w.example && <p className="mt-0.5 text-xs italic text-gray-500 dark:text-gray-400">« {w.example} »</p>}
+                  {w.example && <p className="mt-0.5 text-xs italic text-gray-500 dark:text-gray-400">« {w.example} »{exampleFr(w.example) && <span className="block not-italic">{exampleFr(w.example)}</span>}</p>}
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
                   <SpeakButton text={w.en} small />

@@ -1,3 +1,4 @@
+import { mamanExamplesFr } from './examples-fr.ts'
 import type { EditionContent } from '../edition-content.ts'
 import { mamanGrammarGroups, mamanGrammarLessons } from './grammar.ts'
 import { dayTheme, eatOutTheme, foodTheme, homeTheme, meTheme } from './themes-1.ts'
@@ -21,6 +22,7 @@ export const mamanContent: EditionContent = {
   translations: mamanTranslations,
   pronunciation: mamanPronunciation,
   changelog: mamanChangelog,
+  examplesFr: mamanExamplesFr,
   expressionDeckIds: ['mm-deck-phrases'],
   ui: {
     coursesLabel: 'Mes thèmes',

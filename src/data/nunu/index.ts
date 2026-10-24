@@ -1,3 +1,4 @@
+import { nunuExamplesFr } from './examples-fr.ts'
 import type { EditionContent } from '../edition-content.ts'
 import { nunuGrammarGroups, nunuGrammarLessons } from './grammar-3.ts'
 import { familyTheme, helloTheme, numbersTheme, timeTheme } from './themes-1.ts'
@@ -21,6 +22,7 @@ export const nunuContent: EditionContent = {
   translations: nunuTranslations,
   pronunciation: nunuPronunciation,
   changelog: nunuChangelog,
+  examplesFr: nunuExamplesFr,
   expressionDeckIds: ['nn-deck-phrases'],
   irregularVerbs: nunuIrregularVerbs,
   ui: {

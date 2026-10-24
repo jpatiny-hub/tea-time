@@ -1,3 +1,5 @@
+import { attachDialogueFr, attachReadingFr } from '../translations.ts'
+import { jujuDialoguesFr, jujuReadingsFr } from './translations.ts'
 import type { Dialogue, ReadingText, WritingTask } from '../../types'
 import { lexieDialogue, lexieReading } from './lexie.ts'
 
@@ -103,7 +105,7 @@ const coreReadingTexts: ReadingText[] = [
   },
 ]
 
-export const jujuReadingTexts: ReadingText[] = [...coreReadingTexts, lexieReading]
+export const jujuReadingTexts: ReadingText[] = attachReadingFr([...coreReadingTexts, lexieReading], jujuReadingsFr)
 
 const coreDialogues: Dialogue[] = [
   {
@@ -179,7 +181,7 @@ const coreDialogues: Dialogue[] = [
   },
 ]
 
-export const jujuDialogues: Dialogue[] = [...coreDialogues, lexieDialogue]
+export const jujuDialogues: Dialogue[] = attachDialogueFr([...coreDialogues, lexieDialogue], jujuDialoguesFr)
 
 export const jujuWritingTasks: WritingTask[] = [
   {

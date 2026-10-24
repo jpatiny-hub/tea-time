@@ -1,3 +1,5 @@
+import { attachDialogueFr, attachReadingFr } from '../translations.ts'
+import { nunuDialoguesFr, nunuReadingsFr } from './translations.ts'
 import type { Dialogue, Level, McqExercise, ReadingText, WritingTask } from '../../types.ts'
 
 // Nunu — lectures, dialogues et sujets d'écrit en néerlandais (A1). Textes originaux et courts.
@@ -21,7 +23,7 @@ function dialogue(id: string, title: string, level: Level, module: string, conte
   }
 }
 
-export const nunuReadingTexts: ReadingText[] = [
+const readingsRaw: ReadingText[] = [
   reading('nn-r-nunu', 'Dag, ik ben Nunu', 'A1', 'nn-hello', [
     'Dag! Ik ben Nunu. Ik ben dertig jaar oud. Ik kom uit Frankrijk, maar ik woon in België, in Gent.',
     'Ik heb een man en twee kinderen. Mijn zoon heet Noah en mijn dochter heet Lena. Noah is vijf jaar en Lena is twee.',
@@ -69,7 +71,7 @@ export const nunuReadingTexts: ReadingText[] = [
   ]),
 ]
 
-export const nunuDialogues: Dialogue[] = [
+const dialoguesRaw: Dialogue[] = [
   dialogue('nn-d-hello', 'Dag, aangenaam!', 'A1', 'nn-hello', 'Nunu ontmoet haar nieuwe buurvrouw, Els, op straat.', [
     ['Nunu', 'Goedemiddag! Ik ben Nunu. Ik woon naast u.'],
     ['Els', 'Dag Nunu, aangenaam. Ik ben Els.'],
@@ -195,6 +197,9 @@ export const nunuDialogues: Dialogue[] = [
     ['Qu’apporte Els ?', ['Un gâteau', 'Du café', 'Des fleurs', 'Du pain']],
   ]),
 ]
+
+export const nunuReadingTexts: ReadingText[] = attachReadingFr(readingsRaw, nunuReadingsFr)
+export const nunuDialogues: Dialogue[] = attachDialogueFr(dialoguesRaw, nunuDialoguesFr)
 
 const task = (id: string, module: string, level: Level, type: WritingTask['type'], title: string, prompt: string, tipsFr: string, minWords: number, maxWords: number, targetPhrases: string[], checklist: string[], model: string): WritingTask => ({
   id, module, level, type, title, prompt, tipsFr, minWords, maxWords, targetPhrases, checklist, model,

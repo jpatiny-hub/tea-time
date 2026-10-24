@@ -1,3 +1,5 @@
+import { attachDialogueFr, attachReadingFr } from '../translations.ts'
+import { mamanDialoguesFr, mamanReadingsFr } from './translations.ts'
 import type { Dialogue, Level, McqExercise, ReadingText, WritingTask } from '../../types.ts'
 
 // Maman — lectures, dialogues et sujets d'écrit (A1 → B1). Textes originaux, courts, du vocabulaire des thèmes.
@@ -20,7 +22,7 @@ function dialogue(id: string, title: string, level: Level, module: string, conte
   }
 }
 
-export const mamanReadingTexts: ReadingText[] = [
+const readingsRaw: ReadingText[] = [
   reading('mm-r-anna', 'Hello, I’m Anna', 'A1', 'mm-me', [
     'Hello! My name is Anna and I am sixty-two years old. I am from Belgium and I live in a small house near Liège with my husband, Peter.',
     'We have three children: two sons and a daughter. My daughter, Julie, lives in Brussels with her husband and their two children. My sons live near us. I have four grandchildren and I see them every week.',
@@ -77,7 +79,7 @@ export const mamanReadingTexts: ReadingText[] = [
   ]),
 ]
 
-export const mamanDialogues: Dialogue[] = [
+const dialoguesRaw: Dialogue[] = [
   dialogue('mm-d-meeting', 'Nice to meet you', 'A1', 'mm-me', 'Anna meets Susan, the new neighbour, in the street.', [
     ['Anna', 'Hello! I’m Anna. I live in the house next door.'],
     ['Susan', 'Hello, Anna. I’m Susan. Nice to meet you!'],
@@ -233,6 +235,9 @@ export const mamanDialogues: Dialogue[] = [
     ['When will Mark show Anna how to restart the machine?', ['After lunch', 'Tomorrow', 'Now', 'On Monday']],
   ]),
 ]
+
+export const mamanReadingTexts: ReadingText[] = attachReadingFr(readingsRaw, mamanReadingsFr)
+export const mamanDialogues: Dialogue[] = attachDialogueFr(dialoguesRaw, mamanDialoguesFr)
 
 const task = (id: string, module: string, level: Level, type: WritingTask['type'], title: string, prompt: string, tipsFr: string, minWords: number, maxWords: number, targetPhrases: string[], checklist: string[], model: string): WritingTask => ({
   id, module, level, type, title, prompt, tipsFr, minWords, maxWords, targetPhrases, checklist, model,
