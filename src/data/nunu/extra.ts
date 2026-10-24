@@ -231,4 +231,12 @@ export const nunuChangelog: ChangelogEntry[] = [
       'Nouveau jeu de rôle : choisis un personnage d’un dialogue, l’appli joue les autres avec leurs voix et tu dis tes répliques à voix haute (la reconnaissance vocale te dit si c’est bon). Aussi dans le Parcours, après chaque dialogue (facultatif).',
     ],
   },
+  {
+    version: 7,
+    date: '2026-10-24',
+    title: 'Dictionnaire néerlandais 📖',
+    changes: [
+      'L’aide vocabulaire (toucher un mot) connaît maintenant environ 1 000 mots de base du néerlandais, avec leurs formes (pluriels, verbes conjugués, diminutifs).',
+    ],
+  },
 ]

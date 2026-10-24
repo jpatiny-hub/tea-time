@@ -14,6 +14,7 @@ import { changelog } from '../src/data/changelog.ts'
 import { themes } from '../src/data/themes.ts'
 import { EDITION } from '../src/edition.ts'
 import { CORE_EN } from '../src/data/lexicon-en.ts'
+import { CORE_NL } from '../src/data/lexicon-nl.ts'
 import { exampleFr } from '../src/data/examples.ts'
 import { checkAnswer, checkVocab, contractionKey, normalizeForComparison, vocabCandidates } from '../src/lib/text.ts'
 import type { Exercise } from '../src/types.ts'
@@ -175,8 +176,8 @@ for (const t of readingTexts) {
 }
 
 // Dictionnaire de base (aide vocabulaire) : chaque ligne « formes = traduction ».
-CORE_EN.split('\n').forEach((line, i) => {
-  if (line.trim() && !/^[^=]+=.+$/.test(line)) errors.push(`lexicon-en : ligne ${i + 1} mal formée « ${line.slice(0, 40)} »`)
+for (const [name, lex] of [['lexicon-en', CORE_EN], ['lexicon-nl', CORE_NL]] as const) lex.split('\n').forEach((line, i) => {
+  if (line.trim() && !/^[^=]+=.+$/.test(line)) errors.push(`${name} : ligne ${i + 1} mal formée « ${line.slice(0, 40)} »`)
 })
 
 // Parcours guidé (Maman, Nunu) : chaque étape doit produire des exercices valides, aux ids uniques.

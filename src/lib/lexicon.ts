@@ -3,6 +3,7 @@
 // (tous les paquets de l'accès), puis le petit dictionnaire de base (anglais seulement). Tout reste local.
 import { allVocab } from '../data/vocabulary.ts'
 import { CORE_EN } from '../data/lexicon-en.ts'
+import { CORE_NL } from '../data/lexicon-nl.ts'
 import { EDITION } from '../edition.ts'
 import type { VocabItem } from '../types.ts'
 
@@ -19,8 +20,8 @@ const norm = (w: string) => w.toLowerCase().replace(/[’‘`´]/g, "'")
 const ARTICLE = /^(?:the|an?|to|de|het|een|te)\s+/i
 
 const core = new Map<string, string>()
-if (EDITION.lang === 'en') {
-  for (const line of CORE_EN.split('\n')) {
+{
+  for (const line of (EDITION.lang === "en" ? CORE_EN : CORE_NL).split('\n')) {
     const [keys, fr] = line.split('=')
     if (!fr) continue
     for (const k of keys.split(',')) {
@@ -37,13 +38,17 @@ const vocab = new Map<string, VocabItem>()
 const expressions: { text: string; item: VocabItem }[] = []
 
 for (const item of allVocab) {
-  for (const alt of item.en.replace(/\(.*?\)/g, ' ').split(/\s\/\s/)) {
+  const alts = item.en.replace(/\(.*?\)/g, ' ').split(/\s\/\s/)
+  // « milk / butter » = « lait / beurre » : chaque mot reçoit sa propre traduction ; sinon on ne rattache pas la traduction à un mot isolé.
+  const frParts = item.fr.split(/\s\/\s/)
+  const aligned = alts.length === 1 || frParts.length === alts.length
+  alts.forEach((alt, idx) => {
     const cleaned = norm(alt.replace(/[…?!.]+$/g, '').replace(ARTICLE, '').trim())
-    if (!cleaned) continue
+    if (!cleaned) return
     if (/\s/.test(cleaned)) {
       if (cleaned.length >= 5) expressions.push({ text: cleaned, item })
-    } else if (!vocab.has(cleaned)) vocab.set(cleaned, item)
-  }
+    } else if (aligned && !vocab.has(cleaned)) vocab.set(cleaned, alts.length === 1 ? item : { ...item, fr: frParts[idx] })
+  })
 }
 
 /** Formes de base possibles d'un mot (pluriel, passé, -ing, comparatif…), de la plus probable à la moins probable. */
@@ -63,10 +68,43 @@ export function baseForms(word: string): string[] {
     if (w.endsWith('ily')) add(`${w.slice(0, -3)}y`)
     if (w.endsWith('ly')) add(w.slice(0, -2))
   } else {
-    // Néerlandais : pluriels en -en / -s, diminutifs.
-    if (w.endsWith('en')) add(w.slice(0, -2))
+    // Néerlandais : pluriels (-en, -s, -'s), diminutifs, formes du verbe (ik werk / hij werkt / werkte / gewerkt), adjectifs en -e.
+    const collapse = (x: string) => x.replace(/([aeou])\1/g, '$1') // maak → mak
+    const respell = (x: string) => x.replace(/z/g, 's').replace(/v/g, 'f') // huizen → huis
+    const respellBack = (x: string) => x.replace(/s$/, 'z').replace(/f$/, 'v')
+    const addStem = (st: string) => {
+      add(st)
+      add(`${st}en`)
+      add(`${st}${st.slice(-1)}en`) // blaf → blaffen
+      add(`${collapse(st)}en`)
+      add(`${st.replace(/s$/, 'z')}en`)
+      add(`${collapse(st).replace(/s$/, 'z')}en`)
+      add(`${st.replace(/f$/, 'v')}en`)
+      add(`${collapse(st).replace(/f$/, 'v')}en`)
+    }
+    for (const suf of ['etjes', 'tjes', 'pjes', 'jes', 'etje', 'tje', 'pje', 'je']) if (w.endsWith(suf)) add(w.slice(0, -suf.length))
+    if (w.endsWith('jes')) add(w.slice(0, -1))
+    if (w.endsWith('en')) {
+      const st = w.slice(0, -2)
+      add(st)
+      add(w.slice(0, -1))
+      if (/([bcdfghjklmnpqrstvwxz])\1$/.test(st)) add(st.slice(0, -1)) // mannen → man
+      add(st.replace(/([aeou])([bcdfghjklmnpqrstvwxz])$/, '$1$1$2')) // straten → straat
+      add(respell(st))
+      add(respell(st).replace(/([aeou])([bcdfghjklmnpqrstvwxz])$/, '$1$1$2'))
+    }
     if (w.endsWith('s')) add(w.slice(0, -1))
-    if (w.endsWith('jes')) add(`${w.slice(0, -3)}`)
+    if (w.endsWith('e')) { const st = w.slice(0, -1); add(st); add(st.replace(/([aeou])([bcdfghjklmnpqrstvwxz])$/, '$1$1$2')); add(respell(st)) }
+    if (w.endsWith('t') || w.endsWith('d')) addStem(w.slice(0, -1))
+    if (w.startsWith('ge') && (w.endsWith('t') || w.endsWith('d') || w.endsWith('en'))) {
+      const body = w.slice(2, w.endsWith('en') ? -2 : -1)
+      addStem(body)
+      add(`${body}en`)
+    }
+    if (w.endsWith('te') || w.endsWith('de')) addStem(w.slice(0, -2))
+    if (w.endsWith('ten') || w.endsWith('den')) addStem(w.slice(0, -3))
+    addStem(w)
+    void respellBack
   }
   return out
 }

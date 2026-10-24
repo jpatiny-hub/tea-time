@@ -117,6 +117,52 @@ export const mamanDialoguesFr: Record<string, string[]> = {
   ],
 }
 
+const newDialoguesFr: Record<string, string[]> = {
+  'mm-d-mail': [
+    'Tom, pourrais-tu m’aider, s’il te plaît ? Je veux envoyer une photo à ta tante.',
+    'Bien sûr, mamie. Tu as son adresse e-mail ?',
+    'Oui, elle est sur un bout de papier. C’est difficile d’envoyer une photo ?',
+    'Non, c’est facile. D’abord, écris un objet court, par exemple « Nos vacances ».',
+    'D’accord. Et où est-ce que je mets la photo ?',
+    'Clique sur « joindre » et choisis la photo. Puis écris un message et appuie sur « envoyer ».',
+    'Merci, c’est très gentil. Chère Julie, je t’envoie une photo… Comment je termine ?',
+    'Tu peux écrire « Amicalement » ou « Je t’embrasse », et ton prénom.',
+  ],
+  'mm-d-post': [
+    'Bonjour. Je voudrais envoyer ce colis en France, s’il vous plaît.',
+    'Bien sûr. Pourriez-vous le poser sur la balance, s’il vous plaît ?',
+    'Voilà. Combien ça coûte ?',
+    'Il pèse deux kilos. Cela fait quatorze euros.',
+    'Combien de temps cela prendra-t-il ?',
+    'Environ quatre jours. Pourriez-vous remplir ce formulaire et écrire l’adresse ici ?',
+    'Certainement. Où dois-je signer ?',
+    'Ici, en bas. Merci. Voici votre reçu.',
+    'Merci beaucoup. Au revoir !',
+  ],
+  'mm-d-cinema': [
+    'Bonsoir. Deux places pour le film de huit heures, s’il vous plaît.',
+    'Certainement. Les places sont-elles pour des adultes ?',
+    'Oui. Y a-t-il une réduction pour les seniors ?',
+    'Oui, les seniors paient six euros au lieu de neuf.',
+    'Parfait ! Reste-t-il des places au milieu ?',
+    'Oui, rangée sept. Cela fait douze euros au total.',
+    'À quelle heure le film se termine-t-il ?',
+    'Vers dix heures dix. Il n’y a pas d’entracte.',
+    'Merci. Bon film !',
+  ],
+  'mm-d-grandson': [
+    'Bonjour, Tom ! Comment s’est passée l’école aujourd’hui ?',
+    'Bien ! On a dessiné des animaux et j’ai gagné un jeu.',
+    'Bravo ! Je suis fière de toi. Tu veux un goûter ?',
+    'Oui, s’il te plaît. Je peux avoir une pomme et un biscuit ?',
+    'Bien sûr. Tu as des devoirs ?',
+    'Seulement un peu. Je dois lire une page.',
+    'D’accord. Après ton goûter, on fera tes devoirs, et ensuite on pourra jouer à un jeu.',
+    'Oui ! Mamie, tu me liras une histoire ce soir ?',
+    'Bien sûr, mon chéri. C’est promis.',
+  ],
+}
+
 export const mamanReadingsFr: Record<string, string[]> = {
   'mm-r-anna': [
     'Bonjour ! Je m’appelle Anna et j’ai soixante-deux ans. Je viens de Belgique et j’habite une petite maison près de Liège avec mon mari, Peter.',
@@ -149,3 +195,5 @@ export const mamanReadingsFr: Record<string, string[]> = {
     'Si vous visitez la Belgique, apportez une veste chaude, un imperméable et une paire de chaussures confortables. Et souvenez-vous : si le temps est mauvais, il y a toujours un bon café tout près !',
   ],
 }
+
+Object.assign(mamanDialoguesFr, newDialoguesFr)

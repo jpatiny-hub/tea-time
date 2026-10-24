@@ -1,15 +1,17 @@
 import { mamanExamplesFr } from './examples-fr.ts'
+import { mamanThemes4ExamplesFr } from './themes-4-fr.ts'
 import type { EditionContent } from '../edition-content.ts'
 import { mamanGrammarGroups, mamanGrammarLessons } from './grammar.ts'
 import { dayTheme, eatOutTheme, foodTheme, homeTheme, meTheme } from './themes-1.ts'
 import { clothesTheme, friendsTheme, healthTheme, townTheme, travelTheme } from './themes-2.ts'
 import { hobbiesTheme, phoneTheme, weatherTheme, workTheme } from './themes-3.ts'
+import { adminTheme, grandkidsTheme, mailTheme, outingsTheme } from './themes-4.ts'
 import { mamanDialogues, mamanReadingTexts, mamanWritingTasks } from './texts.ts'
 import { mamanChangelog, mamanPronunciation, mamanSharedDecks, mamanTranslations } from './extra.ts'
 
 // Ordre des thèmes : de la vie de tous les jours vers les situations plus variées.
 // ⚠️ Ne jamais retirer ni renommer un thème (les ids portent la progression) ; en ajouter À LA FIN.
-const themes = [meTheme, homeTheme, dayTheme, foodTheme, eatOutTheme, clothesTheme, townTheme, friendsTheme, travelTheme, healthTheme, weatherTheme, hobbiesTheme, phoneTheme, workTheme]
+const themes = [meTheme, homeTheme, dayTheme, foodTheme, eatOutTheme, clothesTheme, townTheme, friendsTheme, travelTheme, healthTheme, weatherTheme, hobbiesTheme, phoneTheme, workTheme, mailTheme, adminTheme, outingsTheme, grandkidsTheme]
 
 export const mamanContent: EditionContent = {
   grammarLessons: mamanGrammarLessons,
@@ -22,7 +24,7 @@ export const mamanContent: EditionContent = {
   translations: mamanTranslations,
   pronunciation: mamanPronunciation,
   changelog: mamanChangelog,
-  examplesFr: mamanExamplesFr,
+  examplesFr: { ...mamanExamplesFr, ...mamanThemes4ExamplesFr },
   expressionDeckIds: ['mm-deck-phrases'],
   ui: {
     coursesLabel: 'Mes thèmes',

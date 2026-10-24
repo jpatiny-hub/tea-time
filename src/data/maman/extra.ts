@@ -199,4 +199,13 @@ export const mamanChangelog: ChangelogEntry[] = [
       'Nouveau jeu de rôle : choisis un personnage d’un dialogue, l’appli joue les autres avec leurs voix et tu dis tes répliques à voix haute (la reconnaissance vocale te dit si c’est bon). Aussi dans le Parcours, après chaque dialogue (facultatif).',
     ],
   },
+  {
+    version: 7,
+    date: '2026-10-24',
+    title: 'Quatre nouveaux thèmes 🆕',
+    changes: [
+      'E-mails et messages, banque et poste, sorties (cinéma, musée) et petits-enfants / école : 4 thèmes de plus (80 mots, 60 exercices, 4 dialogues).',
+      'Ils s’ajoutent à la fin du Parcours, après le travail : tes progrès actuels ne changent pas.',
+    ],
+  },
 ]
