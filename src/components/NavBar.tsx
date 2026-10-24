@@ -1,17 +1,30 @@
 import { Link, useLocation } from 'react-router-dom'
-import { isDutch, isGuided } from '../edition'
+import { isBasic, isDutch } from '../edition'
 
-const items = [
-  { to: '/', label: 'Accueil', icon: '🏠' },
-  isGuided ? { to: '/parcours', label: 'Parcours', icon: '🧭' } : { to: '/cours', label: 'Cours', icon: '🎓' },
-  { to: '/temps', label: isDutch ? 'Verbes' : 'Temps', icon: '⏳' },
-  { to: '/vocabulaire', label: 'Vocab', icon: '🗂️' },
-  { to: '/pratique', label: 'Pratique', icon: '✍️' },
-  { to: '/revision', label: 'Révision', icon: '🔁' },
-]
+// Accès simplifiés (Jujularage, Maman, Nunu) : 5 onglets, le reste est regroupé dans « Plus ».
+// Jojo garde ses 6 onglets (le Labo des temps est au cœur de son parcours).
+const simple = isBasic
+const PLUS_PREFIXES = ['/plus', '/temps', '/grammaire', '/pratique', '/progres', '/themes', '/nouveautes', '/entrainement', '/cours', '/acces']
 
-function isActive(pathname: string, to: string): boolean {
-  return to === '/' ? pathname === '/' : pathname === to || pathname.startsWith(`${to}/`)
+const items = simple
+  ? [
+      { to: '/', label: 'Accueil', icon: '🏠', match: ['/'] },
+      { to: '/parcours', label: 'Parcours', icon: '🧭', match: ['/parcours', '/lexie'] },
+      { to: '/revision', label: 'Réviser', icon: '🔁', match: ['/revision', '/session'] },
+      { to: '/vocabulaire', label: 'Vocab', icon: '🗂️', match: ['/vocabulaire'] },
+      { to: '/plus', label: 'Plus', icon: '☰', match: PLUS_PREFIXES },
+    ]
+  : [
+      { to: '/', label: 'Accueil', icon: '🏠', match: ['/'] },
+      { to: '/parcours', label: 'Parcours', icon: '🧭', match: ['/parcours', '/lexie', '/cours'] },
+      { to: '/temps', label: isDutch ? 'Verbes' : 'Temps', icon: '⏳', match: ['/temps'] },
+      { to: '/vocabulaire', label: 'Vocab', icon: '🗂️', match: ['/vocabulaire'] },
+      { to: '/pratique', label: 'Pratique', icon: '✍️', match: ['/pratique'] },
+      { to: '/revision', label: 'Révision', icon: '🔁', match: ['/revision', '/session'] },
+    ]
+
+function isActive(pathname: string, match: string[]): boolean {
+  return match.some((m) => (m === '/' ? pathname === '/' : pathname === m || pathname.startsWith(`${m}/`)))
 }
 
 // Barre opaque, sans flou, sans transition ni transformation (cf. CLAUDE.md, robustesse d'affichage).
@@ -22,9 +35,9 @@ export function NavBar() {
   const { pathname } = useLocation()
   return (
     <nav key={pathname} className="fixed inset-x-0 bottom-0 z-20 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
-      <ul className="mx-4 grid grid-cols-6 gap-1 rounded-3xl bg-white p-1.5 shadow-lg ring-1 ring-gray-900/10 sm:mx-auto sm:max-w-[calc(28rem-2rem)] dark:bg-gray-900 dark:ring-white/15">
+      <ul className={`mx-4 grid ${simple ? 'grid-cols-5' : 'grid-cols-6'} gap-1 rounded-3xl bg-white p-1.5 shadow-lg ring-1 ring-gray-900/10 sm:mx-auto sm:max-w-[calc(28rem-2rem)] dark:bg-gray-900 dark:ring-white/15`}>
         {items.map((item) => {
-          const active = isActive(pathname, item.to)
+          const active = isActive(pathname, item.match)
           return (
             <li key={item.to}>
               <Link

@@ -87,13 +87,13 @@ export function useTone(): Tone {
 }
 
 export const card =
-  'rounded-3xl bg-white p-4 shadow-[0_1px_2px_rgba(30,27,75,0.04),0_6px_20px_-8px_rgba(79,70,229,0.18)] ring-1 ring-gray-900/[0.04] dark:bg-gray-900 dark:shadow-none dark:ring-white/[0.07]'
+  'rounded-3xl bg-white p-5 shadow-[0_1px_2px_rgba(30,27,75,0.04),0_6px_20px_-8px_rgba(79,70,229,0.18)] ring-1 ring-gray-900/[0.04] dark:bg-gray-900 dark:shadow-none dark:ring-white/[0.07]'
 export const cardLink = `${card} block`
 export const btnPrimary =
   'w-full rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 py-3 font-bold text-white shadow-md shadow-indigo-500/25 disabled:opacity-40 disabled:shadow-none dark:shadow-none'
 /** Grand bloc en dégradé (révision du jour, score de fin de session…). */
 export const hero =
-  'rounded-3xl bg-linear-to-br from-indigo-500 via-violet-500 to-fuchsia-500 p-5 text-white shadow-lg shadow-indigo-500/25 dark:shadow-none'
+  'rounded-3xl bg-linear-to-br from-indigo-500 via-violet-500 to-fuchsia-500 p-6 text-white shadow-lg shadow-indigo-500/25 dark:shadow-none'
 export const btnSecondary =
   'w-full rounded-2xl bg-indigo-50 py-3 font-bold text-indigo-700 ring-1 ring-indigo-100 disabled:opacity-40 dark:bg-white/[0.06] dark:text-indigo-200 dark:ring-white/10'
 export const input =
@@ -103,7 +103,7 @@ export function Page({ title, subtitle, back, children }: { title: string; subti
   const t = tones[useTone()]
   return (
     <div>
-      <header className={`bg-linear-to-b ${t.header} to-transparent px-4 pb-2 pt-6`}>
+      <header className={`bg-linear-to-b ${t.header} to-transparent px-4 pb-3 pt-7`}>
         {back && (
           <Link to={back.to} className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold shadow-sm ${t.chip}`}>
             ← {back.label}
@@ -112,7 +112,7 @@ export function Page({ title, subtitle, back, children }: { title: string; subti
         <h1 className={`${back ? 'mt-3' : ''} text-2xl font-extrabold tracking-tight`}>{title}</h1>
         {subtitle && <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">{subtitle}</div>}
       </header>
-      <div className="mt-3 px-4">{children}</div>
+      <div className="mt-4 px-4 pb-6">{children}</div>
     </div>
   )
 }
@@ -120,7 +120,7 @@ export function Page({ title, subtitle, back, children }: { title: string; subti
 export function Section({ title, children, right }: { title: string; children: ReactNode; right?: ReactNode }) {
   const t = tones[useTone()]
   return (
-    <section className="mt-7">
+    <section className="mt-9">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           <span className={`h-3 w-1 rounded-full bg-linear-to-b ${t.bar}`} />
@@ -128,7 +128,7 @@ export function Section({ title, children, right }: { title: string; children: R
         </h2>
         {right}
       </div>
-      <div className="mt-2.5 space-y-2.5">{children}</div>
+      <div className="mt-3 space-y-3.5">{children}</div>
     </section>
   )
 }

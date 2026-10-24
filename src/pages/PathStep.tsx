@@ -9,12 +9,16 @@ import {
 } from '../lib/path'
 import type { Exercise, GrammarLesson, VocabItem } from '../types'
 import { catchUpExercises } from '../lib/daily'
+import { WordSprite } from '../components/Pixel'
 import { ExerciseRunner } from '../components/ExerciseRunner'
 import { btnPrimary, btnSecondary, card, Page, Pill, Rich, SpeakButton } from '../components/ui'
 import { GrammarPointView } from './GrammarLesson'
 import { MicResult, useRecognizer } from './Speaking'
 
 const STEP_XP = 10
+
+/** Premier mot d'une entrée (« de keuken », « to live in », « milk / butter ») : celui qu'on illustre. */
+const wordHead = (en: string) => en.replace(/\(.*?\)/g, ' ').split(/\s\/\s/)[0].replace(/^(?:the|an?|to|de|het|een|te)\s+/i, '').trim().split(/\s+/)[0] ?? en
 
 function markDone(step: PathStep) {
   updateProgress((d) => {
@@ -76,6 +80,7 @@ function LearnWords({ unit, items, onDone }: { unit: PathUnit; items: VocabItem[
       <Dots index={i} total={items.length} />
       <div className={`${card} p-5 text-center`}>
         <Pill tone="indigo">Nouveau mot {i + 1}/{items.length}</Pill>
+        <div className="mt-3 flex justify-center"><WordSprite word={wordHead(it.en)} size={80} /></div>
         <p className="mt-3 text-3xl font-extrabold leading-tight">{it.en}</p>
         <p className="mt-1 text-lg font-semibold text-emerald-700 dark:text-emerald-300">{it.fr}</p>
         <div className="mt-3 flex justify-center"><SpeakButton text={it.en} label="Écouter" slow /></div>

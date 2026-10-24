@@ -10,6 +10,7 @@ import { TAG_LABELS } from '../data/content'
 import { btnPrimary, btnSecondary, card, hero, input, LevelBadge, Pill, SpeakButton } from './ui'
 import { EDITION } from '../edition'
 import { TapText } from './TapText'
+import { Confetti, Pixel, WordSprite } from './Pixel'
 import { WordHelpPanel } from './WordHelp'
 import { looksFrench, quotedParts } from '../lib/lexicon'
 import type { AnswerCheck } from '../lib/text'
@@ -255,8 +256,10 @@ export function ExerciseRunner({ items, title, onExit, onFinish, record = true, 
     const pct = Math.round((correct / Math.max(1, results.length)) * 100)
     return (
       <div className="px-4 pt-6">
-        <div className={`${hero} p-6 text-center`}>
-          <p className="text-sm opacity-90">{title ?? 'Session terminée'}</p>
+        <div className={`${hero} relative isolate overflow-hidden p-6 text-center`}>
+          {pct >= 70 && <Confetti seed={results.length + correct} />}
+          <div className="relative flex justify-center">{pct === 100 ? <Pixel name="trophy" size={64} label="Trophée" /> : pct >= 70 ? <Pixel name="tea_mascot" size={64} label="Tea, la mascotte" /> : null}</div>
+          <p className="relative text-sm opacity-90">{title ?? 'Session terminée'}</p>
           <p className="mt-1 text-5xl font-extrabold">{correct} / {results.length}</p>
           {record && (
             <div className="mt-3 inline-flex flex-wrap items-center justify-center gap-2">
@@ -609,6 +612,7 @@ function CardView({
   return (
     <div className="mt-3">
       <div className="flex flex-col items-center rounded-2xl bg-gray-50 p-5 text-center dark:bg-gray-800/60">
+        {toFrench && <WordSprite word={ex.speak.split(' / ')[0].replace(/^(?:the|an?|to|de|het|een|te)\s+/i, '').split(' ')[0]} size={56} />}
         <span className="text-xs text-gray-400">{toFrench ? 'Traduis en français' : `Traduis en ${EDITION.langName}`}</span>
         <span className="mt-2 text-2xl font-bold">{ex.front}</span>
         {toFrench && ex.example && phase === 'answer' && (

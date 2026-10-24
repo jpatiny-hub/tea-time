@@ -144,3 +144,6 @@ html[data-colorblind] .fb-ko { animation-name: fb-ko-cb; }
 @keyframes fb-ok-cb { from { background-color: rgb(59 130 246 / 0.22); } to { background-color: transparent; } }
 @keyframes fb-ko-cb { from { background-color: rgb(249 115 22 / 0.22); } to { background-color: transparent; } }
 @media (prefers-reduced-motion: reduce) { .fb-ok, .fb-ko { animation: none; } }
+
+/* Mise en page aérée : un peu plus d'interligne dans tout le texte. */
+body { line-height: 1.6; }

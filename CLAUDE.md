@@ -78,3 +78,8 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - `SpeakButton slow` affiche aussi 🐢 (voix à 0,6×).
 - `lib/backup.ts` : instantané quotidien dans IndexedDB (7 jours, restaurable depuis l'accueil si la progression a disparu) et `shareBackup` (menu de partage du téléphone, repli : téléchargement). `components/Status.tsx` : bandeau hors ligne, état du mode hors ligne, bandeau de récupération.
 
+## Pixel art et navigation (octobre 2026)
+- `lib/pixel.ts` : petit atelier de dessin 16 × 16 (rectangles, ellipses, lignes, contour foncé automatique, palette commune) + ~45 sprites + correspondance mot → sprite (`KEYS`, anglais et néerlandais). `components/Pixel.tsx` : `Pixel` (SVG net), `WordSprite` (illustre un mot s'il y a un sprite), `Confetti`. Pour ajouter un sprite : le dessiner dans `SPRITES`, lister ses mots dans `KEYS`, vérifier le rendu avec une planche-contact (script jetable).
+- Navigation : accès simplifiés (`isBasic`) = 5 onglets + page `/plus` (`pages/Plus.tsx`, réutilise `sections` de Home) ; Jojo garde 6 onglets.
+- Célébrations : mascotte « Tea » (`tea_mascot`) et confettis en fin de série ≥ 70 %, trophée si 100 % et en fin de leçon, fête aux paliers de série de jours (`steps['celebrated:streak:N']`).
+

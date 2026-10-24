@@ -212,4 +212,15 @@ export const nunuChangelog: ChangelogEntry[] = [
       'Bandeau « Pas de connexion » rassurant, et sauvegarde plus simple : « Envoyer ma sauvegarde » (mail, WhatsApp, Drive…) et copie automatique quotidienne sur l’appareil.',
     ],
   },
+  {
+    version: 5,
+    date: '2026-10-24',
+    title: 'Interface allégée et pixel art 🎨',
+    changes: [
+      'Navigation simplifiée pour Jujularage, Maman et Nunu : 5 onglets (Accueil, Parcours, Réviser, Vocab, Plus). Tout le reste est rangé dans « Plus ».',
+      'Mise en page plus aérée : cartes plus spacieuses, interligne plus confortable.',
+      'Des illustrations en pixel art pour les mots concrets (pain, maison, chat, bus…) : dans les cartes de découverte, la fenêtre d’un mot et « Mes mots ».',
+      'Célébrations : la mascotte Tea et des confettis en fin de série, un trophée à la fin d’une leçon, une fête aux paliers de jours d’affilée (3, 7, 14, 30…).',
+    ],
+  },
 ]

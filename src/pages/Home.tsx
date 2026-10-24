@@ -10,16 +10,18 @@ import { sessions } from '../data/sessions/index'
 import { card, cardLink, hero, IconTile, SpeakButton, type Tone } from '../components/ui'
 import { seasonalTheme, themes } from '../data/themes'
 import { XpBar } from '../components/XpBar'
-import { EDITION, isDutch, isGuided, isJuju } from '../edition'
+import { EDITION, isBasic, isDutch, isGuided, isJuju } from '../edition'
 import { ContinueCard } from './Path'
 import { OfflineBanner, RecoveryBanner } from '../components/Status'
+import { Confetti, Pixel } from '../components/Pixel'
+import { playFeedback } from '../lib/feedback'
 import { isDailyDone } from '../lib/daily'
 import { hasLexie } from '../lib/path'
 import { extra } from '../data/edition-content'
 import { formatDateFr } from '../lib/text'
 import { grammarLessons } from '../data/grammar'
 
-const sections: { to: string; label: string; icon: string; desc: string; tone: Tone }[] = [
+export const sections: { to: string; label: string; icon: string; desc: string; tone: Tone }[] = [
   { to: '/cours', label: extra ? extra.ui.coursesLabel : 'Mes cours', icon: '🎓', desc: extra ? extra.ui.coursesDesc : 'Séances et modules', tone: 'violet' },
   { to: '/temps', label: isDutch ? 'Les verbes' : 'Labo des temps', icon: '⏳', desc: extra ? extra.ui.tensesDesc : 'Past simple, present perfect…', tone: 'amber' },
   { to: '/grammaire', label: 'Grammaire', icon: '📖', desc: `${grammarLessons.length} fiches + exercices`, tone: 'sky' },
@@ -44,6 +46,33 @@ function expressionOfTheDay() {
   const pool = discoveryDecks.filter((d) => ids.includes(d.id)).flatMap((d) => d.items)
   const day = Math.floor(Date.now() / 86_400_000)
   return pool.length > 0 ? pool[day % pool.length] : undefined
+}
+
+const MILESTONES = [3, 7, 14, 30, 60, 100]
+
+/** Série de jours d'affilée : une petite fête aux paliers (3, 7, 14, 30…), une seule fois par palier. */
+function StreakCelebration({ days }: { days: number }) {
+  const data = useProgress()
+  const milestone = [...MILESTONES].reverse().find((m) => days >= m)
+  const key = milestone ? `celebrated:streak:${milestone}` : ''
+  if (!milestone || data.steps[key]) return null
+  return (
+    <div className="relative isolate mt-3 overflow-hidden rounded-3xl bg-amber-50 p-5 text-center ring-1 ring-amber-200 dark:bg-amber-500/10 dark:ring-amber-500/30">
+      <Confetti seed={milestone} />
+      <div className="flex justify-center"><Pixel name="tea_mascot" size={64} label="Tea, la mascotte" /></div>
+      <p className="mt-1 text-lg font-extrabold">🔥 {milestone} jours d’affilée !</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">Quelle belle régularité. Continue comme ça !</p>
+      <button
+        onClick={() => {
+          playFeedback('level')
+          updateProgress((d) => ({ ...d, steps: { ...d.steps, [key]: true } }))
+        }}
+        className="mt-3 rounded-full bg-amber-500 px-5 py-2 text-sm font-extrabold text-white"
+      >
+        Merci ! 🎉
+      </button>
+    </div>
+  )
 }
 
 export function Home() {
@@ -104,6 +133,7 @@ export function Home() {
         </Link>
       </div>
 
+      <StreakCelebration days={days} />
       <OfflineBanner />
       <RecoveryBanner />
 
@@ -199,7 +229,7 @@ export function Home() {
 
       <h2 className="mt-7 text-xs font-extrabold uppercase tracking-wider text-gray-500 dark:text-gray-400">Explorer</h2>
       <div className="mt-2.5 grid grid-cols-2 gap-3">
-        {sections.map((s) => (
+        {(isBasic ? sections.filter((s) => ['/temps', '/grammaire', '/pratique', '/progres'].includes(s.to)) : sections).map((s) => (
           <Link key={s.to} to={s.to} className={cardLink}>
             <IconTile icon={s.icon} tone={s.tone} />
             <p className="mt-2.5 font-extrabold leading-tight">{s.label}</p>
@@ -207,6 +237,14 @@ export function Home() {
           </Link>
         ))}
       </div>
+
+      {isBasic && (
+        <Link to="/plus" className={`${cardLink} mt-4 flex items-center gap-3`}>
+          <IconTile icon="☰" tone="teal" size="sm" />
+          <span className="flex-1 font-bold">Tout voir : écriture, thèmes, traduction, exercices…</span>
+          <span className="text-2xl font-bold leading-none text-teal-600">›</span>
+        </Link>
+      )}
 
       {lastSession && (
         <Link to={`/cours/seance/${lastSession.id}`} className={`${cardLink} mt-3 flex items-center gap-3`}>

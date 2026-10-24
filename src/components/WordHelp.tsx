@@ -4,6 +4,7 @@ import { baseForms, expressionAround, helpWords, lookup } from '../lib/lexicon'
 import { addMyWord, removeMyWord } from '../lib/mywords'
 import { closeWord, openWord, useWordRequest } from '../lib/wordsheet'
 import { EDITION } from '../edition'
+import { WordSprite } from './Pixel'
 import { btnPrimary, btnSecondary, input, SpeakButton } from './ui'
 
 const shortFr = (fr: string) => {
@@ -74,9 +75,12 @@ export function WordSheetHost() {
     <div className="fixed inset-0 z-50 flex items-end bg-black/40" onClick={closeWord} role="dialog" aria-modal="true" aria-label={`Traduction de ${req.word}`}>
       <div className="mx-auto w-full max-w-md rounded-t-3xl bg-white p-5 pb-8 shadow-2xl dark:bg-gray-900" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-3">
-          <div>
+          <div className="flex items-center gap-3">
+            <WordSprite word={req.word} size={52} />
+            <div>
             <p className="text-2xl font-extrabold leading-tight">{req.word}</p>
             {entry && entry.base !== req.word.toLowerCase() && <p className="text-xs text-gray-500 dark:text-gray-400">forme de base : {entry.base}</p>}
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <SpeakButton text={req.word} slow />

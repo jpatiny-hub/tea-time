@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
 import { useProgress } from '../lib/store'
-import { isStepDone, isStepUnlocked, isUnitUnlocked, unitDoneCount, unitOf } from '../lib/path'
+import { isStepDone, isStepUnlocked, isUnitComplete, isUnitUnlocked, unitDoneCount, unitOf, unitsOfTrack } from '../lib/path'
+import { Confetti, Pixel } from '../components/Pixel'
 import { UnitOverviewList } from './Path'
 import { card, Page, ProgressBar } from '../components/ui'
 
@@ -24,6 +25,19 @@ export function PathUnitPage() {
           <span className="text-xs font-bold text-gray-500">{done}/{total}</span>
         </div>
       </div>
+
+      {isUnitComplete(data, unit) && (
+        <div className="relative isolate mt-3 overflow-hidden rounded-3xl bg-emerald-50 p-5 text-center ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:ring-emerald-500/30">
+          <Confetti seed={unit.number} />
+          <div className="flex justify-center"><Pixel name="trophy" size={64} label="Trophée" /></div>
+          <p className="mt-1 text-lg font-extrabold">Leçon terminée, bravo !</p>
+          {unitsOfTrack(unit.track)[unit.number] ? (
+            <Link to={`/parcours/${unitsOfTrack(unit.track)[unit.number].id}`} className="mt-2 inline-block rounded-full bg-emerald-600 px-4 py-2 text-sm font-extrabold text-white">Leçon suivante →</Link>
+          ) : (
+            <p className="text-sm text-gray-600 dark:text-gray-300">Tu as fini tout le parcours !</p>
+          )}
+        </div>
+      )}
 
       <div className="mt-3"><UnitOverviewList unit={unit} /></div>
 
