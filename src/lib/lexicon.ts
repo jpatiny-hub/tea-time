@@ -2,8 +2,6 @@
 // Trois sources, dans cet ordre : les traductions que l'utilisateur a lui-même enregistrées, le vocabulaire de l'appli
 // (tous les paquets de l'accès), puis le petit dictionnaire de base (anglais seulement). Tout reste local.
 import { allVocab } from '../data/vocabulary.ts'
-import { CORE_EN } from '../data/lexicon-en.ts'
-import { CORE_NL } from '../data/lexicon-nl.ts'
 import { EDITION } from '../edition.ts'
 import type { VocabItem } from '../types.ts'
 
@@ -19,9 +17,12 @@ export interface LexEntry {
 const norm = (w: string) => w.toLowerCase().replace(/[’‘`´]/g, "'")
 const ARTICLE = /^(?:the|an?|to|de|het|een|te)\s+/i
 
+// Le dictionnaire de base de la langue apprise, chargé à la demande (un seul des deux est téléchargé et analysé).
+const CORE_TEXT: string = EDITION.lang === 'en' ? (await import('../data/lexicon-en.ts')).CORE_EN : (await import('../data/lexicon-nl.ts')).CORE_NL
+
 const core = new Map<string, string>()
 {
-  for (const line of (EDITION.lang === "en" ? CORE_EN : CORE_NL).split('\n')) {
+  for (const line of CORE_TEXT.split('\n')) {
     const [keys, fr] = line.split('=')
     if (!fr) continue
     for (const k of keys.split(',')) {
@@ -53,8 +54,10 @@ for (const item of allVocab) {
 
 /** Formes de base possibles d'un mot (pluriel, passé, -ing, comparatif…), de la plus probable à la moins probable. */
 export function baseForms(word: string): string[] {
-  const w = norm(word).replace(/'s$/, '')
-  const out = [w]
+  const full = norm(word)
+  const w = full.replace(/'s$/, '')
+  // « it's » est dans le dictionnaire tel quel ; « Peter's » se ramène à « peter ».
+  const out = full === w ? [w] : [full, w]
   const add = (x: string) => x.length >= 2 && out.push(x)
   if (EDITION.lang === 'en') {
     if (w.endsWith('ies')) add(`${w.slice(0, -3)}y`)

@@ -3,9 +3,6 @@
 // la version de l'accès en cours : `extra ? extra.xxx : valeurJojo`.
 import type { ChangelogEntry, CourseModule, Dialogue, Exercise, GrammarGroup, GrammarLesson, IrregularVerb, PronunciationItem, ReadingText, VocabDeck, WritingTask } from '../types.ts'
 import { EDITION } from '../edition.ts'
-import { jujuContent } from './juju/index.ts'
-import { mamanContent } from './maman/index.ts'
-import { nunuContent } from './nunu/index.ts'
 
 export interface EditionUi {
   coursesLabel: string
@@ -41,6 +38,16 @@ export interface EditionContent {
   ui: EditionUi
 }
 
-/** Contenu de l'accès en cours, ou null pour Jojo. */
+/**
+ * Contenu de l'accès en cours, ou null pour Jojo.
+ * Chargé à la demande (import dynamique + await de niveau supérieur) : le contenu des autres accès n'est pas
+ * analysé au démarrage, chaque accès a son propre fichier JavaScript.
+ */
 export const extra: EditionContent | null =
-  EDITION.id === 'jujularage' ? jujuContent : EDITION.id === 'maman' ? mamanContent : EDITION.id === 'nunu' ? nunuContent : null
+  EDITION.id === 'jujularage'
+    ? (await import('./juju/index.ts')).jujuContent
+    : EDITION.id === 'maman'
+      ? (await import('./maman/index.ts')).mamanContent
+      : EDITION.id === 'nunu'
+        ? (await import('./nunu/index.ts')).nunuContent
+        : null

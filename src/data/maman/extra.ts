@@ -208,4 +208,13 @@ export const mamanChangelog: ChangelogEntry[] = [
       'Ils s’ajoutent à la fin du Parcours, après le travail : tes progrès actuels ne changent pas.',
     ],
   },
+  {
+    version: 8,
+    date: '2026-10-24',
+    title: 'Plus fiable, plus rapide ⚡',
+    changes: [
+      'Des tests automatiques vérifient maintenant la correction des réponses avant chaque mise à jour de l’appli.',
+      'L’appli démarre plus vite : le contenu de chaque accès est chargé séparément.',
+    ],
+  },
 ]

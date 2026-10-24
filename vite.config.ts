@@ -21,7 +21,7 @@ export default defineConfig({
         id: 'english-tea-time-2',
         name: 'English — Tea Time',
         short_name: 'English',
-        description: "Application pour progresser en anglais : accès Jojo (B2 → C1) et Jujularage (A1 → A2)",
+        description: "Application pour apprendre l’anglais (et le néerlandais) pas à pas, avec une session du jour, des leçons guidées, de l’écoute et de l’oral",
         theme_color: '#012169',
         background_color: '#eef2ff',
         display: 'standalone',

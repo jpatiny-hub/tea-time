@@ -239,4 +239,13 @@ export const nunuChangelog: ChangelogEntry[] = [
       'L’aide vocabulaire (toucher un mot) connaît maintenant environ 1 000 mots de base du néerlandais, avec leurs formes (pluriels, verbes conjugués, diminutifs).',
     ],
   },
+  {
+    version: 8,
+    date: '2026-10-24',
+    title: 'Plus fiable, plus rapide ⚡',
+    changes: [
+      'Des tests automatiques vérifient maintenant la correction des réponses avant chaque mise à jour de l’appli.',
+      'L’appli démarre plus vite : le contenu de chaque accès est chargé séparément.',
+    ],
+  },
 ]

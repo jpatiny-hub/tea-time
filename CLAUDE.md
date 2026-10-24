@@ -88,3 +88,7 @@ Appli personnelle d'anglais (PWA React/Vite/Tailwind, 100 % locale). L'utilisate
 - Traductions françaises : dialogues et lectures dans `data/<accès>/translations.ts` (rattachées par `data/translations.ts`, bouton « Voir en français »), phrases d'exemple du vocabulaire dans `data/<accès>/examples-fr.ts` (clé = la phrase exacte, `data/examples.ts`). `check-data` exige une traduction pour chaque phrase (sauf Jojo) : en ajoutant un exemple, ajouter sa traduction.
 - Dictionnaires de base de l'aide vocabulaire : `data/lexicon-en.ts` et `data/lexicon-nl.ts` (format `formes = traduction`, voir `lib/lexicon.ts` ; le néerlandais retrouve pluriels, diminutifs et formes verbales par `baseForms`). `check-data` vérifie le format.
 
+## Tests et chargement (octobre 2026)
+- `npm test` (scripts/answers.test.ts, `node:test`, lancé pour Maman = anglais et Nunu = néerlandais) : comparaison des réponses (contractions, UK / US, fautes de frappe, phrases à corriger, phrases à trou), dictionnaires, formes de base. Il tourne dans le workflow de déploiement avant la compilation : un test rouge bloque la publication. Ajouter un test à chaque bug de comparaison corrigé.
+- `data/edition-content.ts` charge le contenu de l'accès avec `await import(…)` (await de niveau supérieur) : Jujularage, Maman et Nunu ont chacun leur fichier JavaScript, et seul le dictionnaire de la langue apprise est chargé. Le contenu de Jojo reste dans le fichier principal (les fichiers `src/data/*.ts` historiques).
+

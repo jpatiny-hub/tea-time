@@ -5,6 +5,15 @@ import { extra } from './edition-content.ts'
 // `version` = précédente + 1 : l'accueil affichera une bannière « Nouveautés ».
 const jojoChangelog: ChangelogEntry[] = [
   {
+    version: 15,
+    date: '2026-10-24',
+    title: 'Plus fiable, plus rapide ⚡',
+    changes: [
+      'Des tests automatiques vérifient maintenant la correction des réponses avant chaque mise à jour de l’appli.',
+      'L’appli démarre plus vite : le contenu de chaque accès est chargé séparément.',
+    ],
+  },
+  {
     version: 14,
     date: '2026-10-24',
     title: 'Parler plus et voir en français 🎭',
